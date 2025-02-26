@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "repository": "https://github.com/brazucas/fivem-brz-inventory.git",
   "license": "ISC",
+  "scripts": {
+    "prebuild": "rimraf ./dist && tsc --noEmit -p client/tsconfig.json",
+    "build": "node build/build-bundle.js",
+    "changelog": "git cliff -o CHANGELOG.md"
+  },
   "devDependencies": {
     "@citizenfx/client": "^2.0.13045-1",
     "@citizenfx/server": "^2.0.13045-1",
