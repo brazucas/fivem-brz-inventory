@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### Documentation
+
+- Add changelog file
+- Add nui placeholder
+
 ### Features
 
 - Install local dev deps
@@ -17,6 +22,7 @@ All notable changes to this project will be documented in this file.
 
 - Update .gitignore
 - Add build script
+- Add husky scripts
 
 ### Testing
 
