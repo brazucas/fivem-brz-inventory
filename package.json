@@ -1,0 +1,16 @@
+{
+  "name": "fivem-brz-inventory",
+  "version": "1.0.0",
+  "repository": "https://github.com/brazucas/fivem-brz-inventory.git",
+  "license": "ISC",
+  "devDependencies": {
+    "@citizenfx/client": "^2.0.13045-1",
+    "@citizenfx/server": "^2.0.13045-1",
+    "esbuild": "^0.20.2",
+    "git-cliff": "1",
+    "husky": "8",
+    "rimraf": "^5.0.5",
+    "typescript": "4"
+  },
+  "dependencies": {}
+}
