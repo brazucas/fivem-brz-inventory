@@ -17,12 +17,18 @@ All notable changes to this project will be documented in this file.
 - Add client placeholder
 - Add build script
 - Removing watch mode
+- Add inventory types
+- Add memory storage adapter
+- Add createItem function
 
 ### Miscellaneous Tasks
 
 - Update .gitignore
 - Add build script
 - Add husky scripts
+- Update changelog
+- Add common types
+- Setup jest files
 
 ### Testing
 
