@@ -1,5 +1,5 @@
 import { Item, ItemDefaults, ItemRarity, ItemType } from "@common/types";
-import { createItem as persistItem } from "./adapters/memory.storage";
+import { registerItem as persistItem } from "./adapters/memory.storage";
 
 export const registerItem = async (item: Partial<Item>): Promise<Item> => {
   const newItem = {

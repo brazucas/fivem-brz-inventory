@@ -2,7 +2,7 @@ global.on = jest.fn();
 
 import { Item, ItemId } from "@common/types";
 import { registerItem } from "./inventory-server.service";
-import { createItem as persistItem } from "./adapters/memory.storage";
+import { registerItem as persistItem } from "./adapters/memory.storage";
 
 jest.mock("./adapters/memory.storage", () => ({
   createItem: jest.fn(),

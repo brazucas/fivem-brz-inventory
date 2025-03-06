@@ -1,5 +1,5 @@
 import { Item, ItemId } from "@common/types";
-import { createItem, getItem } from "./memory.storage";
+import { registerItem, getItem } from "./memory.storage";
 
 describe("MemoryStorage", () => {
   const props = {
@@ -20,12 +20,12 @@ describe("MemoryStorage", () => {
   };
 
   it("should store a new item", async () => {
-    const item = await createItem(props as Item);
+    const item = await registerItem(props as Item);
     expect(item).toEqual(props);
   });
 
   it("should retriave a stored item", async () => {
-    const item = await createItem(props as Item);
+    const item = await registerItem(props as Item);
     expect(getItem("test")).toEqual(props);
   });
 });
