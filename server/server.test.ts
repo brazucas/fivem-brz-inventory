@@ -51,7 +51,7 @@ global.GetCurrentResourceName = jest.fn().mockReturnValue("brz-inventory");
 ];
 
 import { InventoryItem, ItemId } from "@common/types";
-import { createItem, onResourceStart } from "./server";
+import { registerItem, onResourceStart } from "./server";
 import { createItem as persistItem } from "./adapters/memory.storage";
 
 jest.mock("./adapters/memory.storage", () => ({
@@ -143,7 +143,7 @@ describe("Server", () => {
   });
 
   it("should create a new item", async () => {
-    expect(await createItem(validItem)).toEqual(validItem);
+    expect(await registerItem(validItem)).toEqual(validItem);
     expect(persistItem).toHaveBeenCalledWith(validItem);
   });
 
@@ -152,7 +152,7 @@ describe("Server", () => {
       "should throw an error if %s is missing",
       async (param) => {
         const invalidItem = { ...validItem, [param]: undefined };
-        await expect(createItem(invalidItem)).rejects.toThrow(
+        await expect(registerItem(invalidItem)).rejects.toThrow(
           `Missing required parameter: ${param}`
         );
       }
@@ -173,7 +173,7 @@ describe("Server", () => {
           decayable: true,
           [paramToInvalidate]: undefined,
         };
-        await expect(createItem(invalidItem)).rejects.toThrow(
+        await expect(registerItem(invalidItem)).rejects.toThrow(
           "Decayable items require decayChance, decayInterval, decayThreshold, and decayedItem"
         );
       }
@@ -188,7 +188,7 @@ describe("Server", () => {
         decayThreshold: 0,
         decayedItem: "test" as ItemId,
       };
-      await expect(createItem(validDecayableItem)).resolves.not.toThrow();
+      await expect(registerItem(validDecayableItem)).resolves.not.toThrow();
     });
   });
 
@@ -199,7 +199,7 @@ describe("Server", () => {
         droppable: true,
         groundObject: undefined,
       };
-      await expect(createItem(invalidItem)).rejects.toThrow(
+      await expect(registerItem(invalidItem)).rejects.toThrow(
         "Droppable items require a groundObject"
       );
     });
@@ -210,7 +210,7 @@ describe("Server", () => {
         droppable: false,
         groundObject: undefined,
       };
-      await expect(createItem(validNonDroppableItem)).resolves.not.toThrow();
+      await expect(registerItem(validNonDroppableItem)).resolves.not.toThrow();
     });
   });
 
@@ -221,7 +221,7 @@ describe("Server", () => {
         usable: true,
         onUseHandler: undefined,
       };
-      await expect(createItem(invalidItem)).rejects.toThrow(
+      await expect(registerItem(invalidItem)).rejects.toThrow(
         "Usable items require an onUseHandler"
       );
     });
@@ -232,14 +232,14 @@ describe("Server", () => {
         usable: false,
         onUseHandler: undefined,
       };
-      await expect(createItem(validNonUsableItem)).resolves.not.toThrow();
+      await expect(registerItem(validNonUsableItem)).resolves.not.toThrow();
     });
   });
 
   describe("Item tier", () => {
     test.each([0, 6])("should throw an error if tier is %i", async (tier) => {
       const invalidItem = { ...validItem, tier } as InventoryItem;
-      await expect(createItem(invalidItem)).rejects.toThrow(
+      await expect(registerItem(invalidItem)).rejects.toThrow(
         "Item tier must be between 1 and 5"
       );
     });
@@ -248,7 +248,7 @@ describe("Server", () => {
       "should not throw an error if tier is %i",
       async (tier) => {
         const validTierItem = { ...validItem, tier } as InventoryItem;
-        await expect(createItem(validTierItem)).resolves.not.toThrow();
+        await expect(registerItem(validTierItem)).resolves.not.toThrow();
       }
     );
   });
@@ -259,7 +259,7 @@ describe("Server", () => {
         ...validItem,
         rarity: "invalid" as any,
       } as InventoryItem;
-      await expect(createItem(invalidItem)).rejects.toThrow(
+      await expect(registerItem(invalidItem)).rejects.toThrow(
         "Invalid item rarity"
       );
     });
@@ -269,7 +269,7 @@ describe("Server", () => {
         ...validItem,
         rarity: "common",
       } as InventoryItem;
-      await expect(createItem(validRarityItem)).resolves.not.toThrow();
+      await expect(registerItem(validRarityItem)).resolves.not.toThrow();
     });
   });
 
@@ -279,7 +279,7 @@ describe("Server", () => {
         ...validItem,
         type: "invalid" as any,
       } as InventoryItem;
-      await expect(createItem(invalidItem)).rejects.toThrow(
+      await expect(registerItem(invalidItem)).rejects.toThrow(
         "Invalid item type"
       );
     });
@@ -289,7 +289,7 @@ describe("Server", () => {
         ...validItem,
         type: "weapon",
       } as InventoryItem;
-      await expect(createItem(validTypeItem)).resolves.not.toThrow();
+      await expect(registerItem(validTypeItem)).resolves.not.toThrow();
     });
   });
 });

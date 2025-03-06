@@ -20,14 +20,14 @@ on("onResourceStart", onResourceStart);
 const registerItems = async () => {
   for (const item of ITEMS) {
     try {
-      await createItem(item);
+      await registerItem(item);
     } catch (e: any) {
       console.error(`Failed to register item ${item.id}: ${e.message}`);
     }
   }
 };
 
-export const createItem = async (
+export const registerItem = async (
   item: Partial<InventoryItem>
 ): Promise<InventoryItem> => {
   const newItem = {
