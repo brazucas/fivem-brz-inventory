@@ -9,8 +9,9 @@
     "types": ["@citizenfx/server", "@types/node", "@types/jest"],
     "lib": ["ES2020"],
     "paths": {
+      "@common/*": ["../common/*"],
       "@/*": ["./*"]
     }
   },
-  "include": ["./**/*"]
+  "include": ["./**/*", "../common/**/*"]
 }
