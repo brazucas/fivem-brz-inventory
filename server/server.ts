@@ -1,11 +1,6 @@
-declare const ITEMS: InventoryItem[];
+declare const ITEMS: Item[];
 
-import {
-  InventoryItem,
-  ItemDefaults,
-  ItemRarity,
-  ItemType,
-} from "@common/types";
+import { Item, ItemDefaults, ItemRarity, ItemType } from "@common/types";
 import { createItem as persistItem } from "./adapters/memory.storage";
 
 export const onResourceStart = async (resName: string) => {
@@ -27,13 +22,11 @@ const registerItems = async () => {
   }
 };
 
-export const registerItem = async (
-  item: Partial<InventoryItem>
-): Promise<InventoryItem> => {
+export const registerItem = async (item: Partial<Item>): Promise<Item> => {
   const newItem = {
     ...ItemDefaults,
     ...item,
-  } as InventoryItem;
+  } as Item;
 
   validateRequiredParams(newItem);
   validateDecayableItem(newItem);
@@ -48,8 +41,8 @@ export const registerItem = async (
   return newItem;
 };
 
-const validateRequiredParams = (item: Partial<InventoryItem>) => {
-  const requiredParams: (keyof InventoryItem)[] = [
+const validateRequiredParams = (item: Partial<Item>) => {
+  const requiredParams: (keyof Item)[] = [
     "id",
     "name",
     "type",
@@ -64,7 +57,7 @@ const validateRequiredParams = (item: Partial<InventoryItem>) => {
   }
 };
 
-const validateDecayableItem = (item: Partial<InventoryItem>) => {
+const validateDecayableItem = (item: Partial<Item>) => {
   if (
     item.decayable &&
     (item.decayChance === undefined ||
@@ -78,13 +71,13 @@ const validateDecayableItem = (item: Partial<InventoryItem>) => {
   }
 };
 
-const validateDroppableItem = (item: Partial<InventoryItem>) => {
+const validateDroppableItem = (item: Partial<Item>) => {
   if (item.droppable && !item.groundObject) {
     throw new Error("Droppable items require a groundObject");
   }
 };
 
-const validateUsableItem = (item: Partial<InventoryItem>) => {
+const validateUsableItem = (item: Partial<Item>) => {
   if (item.usable && !item.onUseHandler) {
     throw new Error("Usable items require an onUseHandler");
   }

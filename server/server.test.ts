@@ -50,7 +50,7 @@ global.GetCurrentResourceName = jest.fn().mockReturnValue("brz-inventory");
   },
 ];
 
-import { InventoryItem, ItemId } from "@common/types";
+import { Item, ItemId } from "@common/types";
 import { registerItem, onResourceStart } from "./server";
 import { createItem as persistItem } from "./adapters/memory.storage";
 
@@ -80,9 +80,9 @@ describe("Server", () => {
     droppable: true,
     groundObject: "hei_prop_hei_paper_bag",
     usable: false,
-    durability: 100,
+    initialDurability: 100,
     tradable: false,
-  } as InventoryItem;
+  } as Item;
 
   describe("Register events", () => {
     it("should register to onResourceStart event", () => {
@@ -238,7 +238,7 @@ describe("Server", () => {
 
   describe("Item tier", () => {
     test.each([0, 6])("should throw an error if tier is %i", async (tier) => {
-      const invalidItem = { ...validItem, tier } as InventoryItem;
+      const invalidItem = { ...validItem, tier } as Item;
       await expect(registerItem(invalidItem)).rejects.toThrow(
         "Item tier must be between 1 and 5"
       );
@@ -247,7 +247,7 @@ describe("Server", () => {
     test.each([1, 2, 3, 4, 5])(
       "should not throw an error if tier is %i",
       async (tier) => {
-        const validTierItem = { ...validItem, tier } as InventoryItem;
+        const validTierItem = { ...validItem, tier } as Item;
         await expect(registerItem(validTierItem)).resolves.not.toThrow();
       }
     );
@@ -258,7 +258,7 @@ describe("Server", () => {
       const invalidItem = {
         ...validItem,
         rarity: "invalid" as any,
-      } as InventoryItem;
+      } as Item;
       await expect(registerItem(invalidItem)).rejects.toThrow(
         "Invalid item rarity"
       );
@@ -268,7 +268,7 @@ describe("Server", () => {
       const validRarityItem = {
         ...validItem,
         rarity: "common",
-      } as InventoryItem;
+      } as Item;
       await expect(registerItem(validRarityItem)).resolves.not.toThrow();
     });
   });
@@ -278,7 +278,7 @@ describe("Server", () => {
       const invalidItem = {
         ...validItem,
         type: "invalid" as any,
-      } as InventoryItem;
+      } as Item;
       await expect(registerItem(invalidItem)).rejects.toThrow(
         "Invalid item type"
       );
@@ -288,7 +288,7 @@ describe("Server", () => {
       const validTypeItem = {
         ...validItem,
         type: "weapon",
-      } as InventoryItem;
+      } as Item;
       await expect(registerItem(validTypeItem)).resolves.not.toThrow();
     });
   });
