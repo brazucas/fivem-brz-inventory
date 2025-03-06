@@ -22,6 +22,20 @@ export const createItem = async (
     ...item,
   } as InventoryItem;
 
+  validateRequiredParams(newItem);
+  validateDecayableItem(newItem);
+  validateDroppableItem(newItem);
+  validateUsableItem(newItem);
+  validateItemTier(newItem.tier);
+  validateItemRarity(newItem.rarity);
+  validateItemType(newItem.type);
+
+  await persistItem(newItem);
+
+  return newItem;
+};
+
+const validateRequiredParams = (item: Partial<InventoryItem>) => {
   const requiredParams: (keyof InventoryItem)[] = [
     "id",
     "name",
@@ -31,13 +45,15 @@ export const createItem = async (
   ];
 
   for (const param of requiredParams) {
-    if (newItem[param] === undefined) {
+    if (item[param] === undefined) {
       throw new Error(`Missing required parameter: ${param}`);
     }
   }
+};
 
+const validateDecayableItem = (item: Partial<InventoryItem>) => {
   if (
-    newItem.decayable &&
+    item.decayable &&
     (item.decayChance === undefined ||
       item.decayInterval === undefined ||
       item.decayThreshold === undefined ||
@@ -47,28 +63,34 @@ export const createItem = async (
       "Decayable items require decayChance, decayInterval, decayThreshold, and decayedItem"
     );
   }
+};
 
-  if (newItem.droppable && !newItem.groundObject) {
+const validateDroppableItem = (item: Partial<InventoryItem>) => {
+  if (item.droppable && !item.groundObject) {
     throw new Error("Droppable items require a groundObject");
   }
+};
 
-  if (newItem.usable && !newItem.onUseHandler) {
+const validateUsableItem = (item: Partial<InventoryItem>) => {
+  if (item.usable && !item.onUseHandler) {
     throw new Error("Usable items require an onUseHandler");
   }
+};
 
-  if (newItem.tier < 1 || newItem.tier > 5) {
+const validateItemTier = (tier: number) => {
+  if (tier < 1 || tier > 5) {
     throw new Error("Item tier must be between 1 and 5");
   }
+};
 
-  if (Object.values(ItemRarity).indexOf(newItem.rarity) === -1) {
+const validateItemRarity = (rarity: keyof typeof ItemRarity) => {
+  if (Object.values(ItemRarity).indexOf(rarity) === -1) {
     throw new Error("Invalid item rarity");
   }
+};
 
-  if (Object.values(ItemType).indexOf(newItem.type) === -1) {
+const validateItemType = (type: keyof typeof ItemType) => {
+  if (Object.values(ItemType).indexOf(type) === -1) {
     throw new Error("Invalid item type");
   }
-
-  await persistItem(newItem);
-
-  return newItem;
 };
