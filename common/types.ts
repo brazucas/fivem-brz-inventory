@@ -4,7 +4,7 @@ export type Inventory = {
   maxItems: number;
 };
 
-export type InventoryItem = {
+export type Item = {
   id: ItemId;
   name: string;
   type: keyof typeof ItemType;
@@ -17,7 +17,7 @@ export type InventoryItem = {
   groundObject: string;
   usable: boolean;
   onUseHandler?: string;
-  durability: number;
+  initialDurability: number;
   decayable: boolean;
   decayValue?: number;
   decayInterval?: number;
@@ -25,6 +25,14 @@ export type InventoryItem = {
   decayThreshold?: number;
   decayedItem?: ItemId;
   tradable: boolean;
+};
+
+export type InventoryItem = {
+  id: string;
+  inventoryId: string;
+  itemId: ItemId;
+  quantity: number;
+  durability: number;
 };
 
 export const ItemType = {
@@ -44,11 +52,11 @@ export const ItemRarity = {
 
 export type ItemTier = 1 | 2 | 3 | 4 | 5;
 
-export const ItemDefaults: Partial<InventoryItem> = {
+export const ItemDefaults: Partial<Item> = {
   weight: 1,
   stackable: true,
   usable: false,
-  durability: 100,
+  initialDurability: 100,
   droppable: true,
   decayable: false,
   groundObject: "hei_prop_hei_paper_bag",
