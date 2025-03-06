@@ -1,14 +1,12 @@
-import { InventoryItem } from "@common/types";
+import { Item } from "@common/types";
 
-const itemIdIndex: { [id: string]: InventoryItem } = {};
+const itemIdIndex: { [id: string]: Item } = {};
 
-export const createItem = async (
-  item: InventoryItem
-): Promise<InventoryItem> => {
+export const createItem = async (item: Item): Promise<Item> => {
   itemIdIndex[item.id] = item;
   return item;
 };
 
-export const getItem = (id: string): InventoryItem | undefined => {
+export const getItem = (id: string): Item | undefined => {
   return itemIdIndex[id];
 };

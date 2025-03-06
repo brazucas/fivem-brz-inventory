@@ -1,4 +1,4 @@
-import { InventoryItem, ItemId } from "@common/types";
+import { Item, ItemId } from "@common/types";
 import { createItem, getItem } from "./memory.storage";
 
 describe("MemoryStorage", () => {
@@ -15,17 +15,17 @@ describe("MemoryStorage", () => {
     droppable: true,
     groundObject: "hei_prop_hei_paper_bag",
     usable: false,
-    durability: 100,
+    initialDurability: 100,
     tradable: false,
   };
 
   it("should store a new item", async () => {
-    const item = await createItem(props as InventoryItem);
+    const item = await createItem(props as Item);
     expect(item).toEqual(props);
   });
 
   it("should retriave a stored item", async () => {
-    const item = await createItem(props as InventoryItem);
+    const item = await createItem(props as Item);
     expect(getItem("test")).toEqual(props);
   });
 });
