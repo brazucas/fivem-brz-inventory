@@ -1,5 +1,54 @@
 global.on = jest.fn();
 global.GetCurrentResourceName = jest.fn().mockReturnValue("brz-inventory");
+(global as any).ITEMS = [
+  {
+    id: "crowbar",
+    name: "Crowbar",
+    type: "weapon",
+    description:
+      "A trusty tool for prying things open, or for when you just need to make a point.",
+    tier: 1,
+    rarity: "common",
+    weight: 2000,
+    stackable: false,
+    decayable: false,
+    droppable: true,
+    usable: true,
+    onUseHandler: "useCrowbar",
+    tradable: true,
+  },
+  {
+    id: "fish",
+    name: "Fish",
+    type: "food",
+    description:
+      "A slippery friend from the sea, perfect for a quick snack or a smelly prank.",
+    tier: 1,
+    rarity: "common",
+    weight: 2000,
+    stackable: false,
+    decayable: false,
+    droppable: true,
+    usable: true,
+    onUseHandler: "consumeFish",
+    tradable: true,
+  },
+  {
+    id: "invalid",
+    name: "Invalid Item",
+    type: "invalid",
+    description: "An item with invalid type.",
+    tier: 1,
+    rarity: "common",
+    weight: 2000,
+    stackable: false,
+    decayable: false,
+    droppable: true,
+    usable: true,
+    onUseHandler: "useCrowbar",
+    tradable: true,
+  },
+];
 
 import { InventoryItem, ItemId } from "@common/types";
 import { createItem, onResourceStart } from "./server";
@@ -43,13 +92,14 @@ describe("Server", () => {
 
   describe("onResourceStart", () => {
     const consoleLog = jest.spyOn(global.console, "log");
+    const consoleError = jest.spyOn(global.console, "error");
 
     beforeEach(() => {
       consoleLog.mockClear();
     });
 
-    it("should log a translated message when the resource starting is brz-inventory", () => {
-      onResourceStart("brz-inventory");
+    it("should log a translated message when the resource starting is brz-inventory", async () => {
+      await onResourceStart("brz-inventory");
 
       expect(consoleLog).toHaveBeenCalledWith("BRZ Inventory system started");
       expect(GetCurrentResourceName).toHaveBeenCalled();
@@ -58,6 +108,37 @@ describe("Server", () => {
     it("should not log a message when the resource starting is not brz-inventory", () => {
       onResourceStart("brz-core");
       expect(consoleLog).not.toHaveBeenCalled();
+    });
+
+    it("should persist items from the ITEMS global array", async () => {
+      await onResourceStart("brz-inventory");
+      expect(persistItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "crowbar",
+          name: "Crowbar",
+          type: "weapon",
+          description:
+            "A trusty tool for prying things open, or for when you just need to make a point.",
+        })
+      );
+      expect(persistItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "fish",
+          name: "Fish",
+          type: "food",
+          description:
+            "A slippery friend from the sea, perfect for a quick snack or a smelly prank.",
+        })
+      );
+
+      expect(persistItem).toHaveBeenCalledTimes(2);
+    });
+
+    it("should log an error if an item fails to register", async () => {
+      await onResourceStart("brz-inventory");
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to register item invalid: Invalid item type"
+      );
     });
   });
 

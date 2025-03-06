@@ -12,6 +12,7 @@ const ITEMS = [
     decayable: false,
     droppable: true,
     usable: true,
+    onUseHandler: "useCrowbar",
     tradable: true,
   },
 ];
