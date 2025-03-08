@@ -1,7 +1,8 @@
 import {
+  InternalClientEvents,
   InventoryId,
   InventoryItem,
-  InventoryItems,
+  InventoryType,
   Item,
   ItemDefaults,
   ItemId,
@@ -9,14 +10,21 @@ import {
   ItemType,
   RemoveItemOperationResult,
 } from "@common/types";
+import { emitNetTyped } from "@core/helpers/cfx";
 import {
   createInventoryItem as createInventoryItemStore,
   getInventoryItem,
   getItem,
+  listInventoryItems,
   listInventoryItems as listInventoryItemsStore,
   registerItem as persistItem,
   subtractInventoryItem,
 } from "./adapters/memory.storage";
+
+export const getPlayerInventoryId = (playerId: string): InventoryId => {
+  const playerName = GetPlayerName(playerId);
+  return `player_${playerName}` as InventoryId;
+};
 
 export const registerItem = async (item: Partial<Item>): Promise<Item> => {
   const newItem = {
@@ -71,6 +79,7 @@ export const createInventoryItem = async (
   }
 
   await createInventoryItemStore(updatedInventoryItem);
+  await syncPlayerInventoryState(inventoryItem.inventoryId);
 
   return updatedInventoryItem;
 };
@@ -91,6 +100,8 @@ export const removeInventoryItem = async (
   if (!deleted) {
     throw new Error("Failed to remove item from inventory");
   }
+
+  await syncPlayerInventoryState(inventoryId);
 
   return {
     success: true,
@@ -176,6 +187,40 @@ const validatePositiveIntegerParams = (item: Partial<Item>) => {
       throw new Error(`Item ${param} must be a positive integer`);
     }
   }
+};
+
+const syncPlayerInventoryState = async (playerInventoryIndex: InventoryId) => {
+  const [inventoryType, playerName] = playerInventoryIndex.split("_")[1];
+
+  if (inventoryType !== InventoryType.player) {
+    return;
+  }
+
+  const playerId = getPlayers().find(
+    (player) => GetPlayerName(player) === playerName
+  );
+
+  if (!playerId) {
+    return;
+  }
+
+  const playerInventoryId = getPlayerInventoryId(playerName);
+
+  const playerInventoryItems = await listInventoryItems(playerInventoryId);
+
+  const orderedInventoryIndex = playerInventoryItems.reduce(
+    (acc, item, index) => ({
+      ...acc,
+      [index]: item,
+    }),
+    {}
+  );
+
+  emitNetTyped<InternalClientEvents, "brz-inventory:setState">(
+    "brz-inventory:setState",
+    Number(playerId),
+    orderedInventoryIndex
+  );
 };
 
 export { getItem, listInventoryItemsStore as listInventoryItems };

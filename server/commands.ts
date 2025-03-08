@@ -1,17 +1,13 @@
-import {
-  InternalClientEvents,
-  InventoryId,
-  ItemId,
-  Quantity,
-} from "@common/types";
-import {
-  createInventoryItem,
-  getItem,
-  removeInventoryItem,
-} from "./inventory-server.service";
+import { InternalClientEvents, ItemId, Quantity } from "@common/types";
 import { emitNetTyped, isPlayerConnected } from "@core/helpers/cfx";
 import { notify } from "@core/notification";
 import { randomUUID } from "crypto";
+import {
+  createInventoryItem,
+  getItem,
+  getPlayerInventoryId,
+  removeInventoryItem,
+} from "./inventory-server.service";
 
 export const givePlayerItemCommand = async (source: number, args: string[]) => {
   const attributes = validateInventoryItemCommand(source, args);
@@ -26,7 +22,7 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
     await createInventoryItem({
       id: randomUUID(),
       durability: 100,
-      inventoryId: `player_${playerName}` as InventoryId,
+      inventoryId: getPlayerInventoryId(playerId),
       itemId,
       quantity,
     });
@@ -67,7 +63,7 @@ export const removePlayerItemCommand = async (
 
   try {
     await removeInventoryItem(
-      `player_${playerName}` as InventoryId,
+      getPlayerInventoryId(attributes.playerId),
       itemId,
       quantity
     );

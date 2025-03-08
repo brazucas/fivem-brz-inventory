@@ -92,6 +92,10 @@ export type RemoveItemOperationResult = {
   remainingQuantity: number;
 };
 
+export const InventoryType = {
+  player: "player",
+};
+
 export type InternalClientEvents = {
   "brz-inventory:itemReceived": [ItemId, Quantity];
   "brz-inventory:setState": [OrderedInventoryIndex];
