@@ -1,5 +1,5 @@
-import { Item, ItemId } from "@common/types";
-import { registerItem, getItem } from "./memory.storage";
+import { InventoryId, InventoryItem, Item, ItemId } from "@common/types";
+import { registerItem, getItem, createInventoryItem } from "./memory.storage";
 
 describe("MemoryStorage", () => {
   const props = {
@@ -17,15 +17,35 @@ describe("MemoryStorage", () => {
     usable: false,
     initialDurability: 100,
     tradable: false,
-  };
+  } as Item;
 
-  it("should store a new item", async () => {
-    const item = await registerItem(props as Item);
-    expect(item).toEqual(props);
+  describe("registerItem", () => {
+    it("should store a new item", async () => {
+      const item = await registerItem(props);
+      expect(item).toEqual(props);
+    });
   });
 
-  it("should retriave a stored item", async () => {
-    const item = await registerItem(props as Item);
-    expect(getItem("test")).toEqual(props);
+  describe("getItem", () => {
+    it("should retriave a stored item", async () => {
+      const item = await registerItem(props as Item);
+      expect(getItem("test")).toEqual(props);
+    });
+  });
+
+  describe("createInventoryItem", () => {
+    it("should store inventory item", () => {
+      const inventoryItem = {
+        durability: 100,
+        id: "fake-id",
+        inventoryId: "fake-inventory-id" as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
+      const storedItem = createInventoryItem(inventoryItem);
+
+      expect(storedItem).toEqual(inventoryItem);
+    });
   });
 });
