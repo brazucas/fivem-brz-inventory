@@ -72,12 +72,18 @@ export type PlayerId = number & { __opaque__: "PlayerId" };
 
 export type Quantity = number & { __opaque__: "Quantity" };
 
+export type PositionId = number & { __opaque__: "PositionId" };
+
 export type InventoryItems = {
   [inventoryId: InventoryId]:
     | {
         [itemId: ItemId]: InventoryItem;
       }
     | undefined;
+};
+
+export type OrderedInventoryIndex = {
+  [positionId: PositionId]: InventoryItem;
 };
 
 export type RemoveItemOperationResult = {
