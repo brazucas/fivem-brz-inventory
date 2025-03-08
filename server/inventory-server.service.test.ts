@@ -6,7 +6,7 @@ import { InventoryId, InventoryItem, Item, ItemId } from "@common/types";
 import {
   registerItem,
   getItem,
-  createInventoryItem,
+  upsertInventoryItem,
   removeInventoryItem,
 } from "./inventory-server.service";
 import {
@@ -252,7 +252,7 @@ describe("Server", () => {
     });
   });
 
-  describe("createInventoryItem", () => {
+  describe("upsertInventoryItem", () => {
     const inventoryItem = {
       durability: 100,
       id: "fake-id",
@@ -268,7 +268,7 @@ describe("Server", () => {
 
       it("should create inventory item and persist its state when item is valid", async () => {
         (getItemStore as jest.Mock).mockReturnValueOnce({});
-        await createInventoryItem(inventoryItem);
+        await upsertInventoryItem(inventoryItem);
       });
 
       it("should log warn message when trying to create an item with quantity higher than 1 and item is not stackable", async () => {
@@ -278,7 +278,7 @@ describe("Server", () => {
           stackable: false,
         });
 
-        await createInventoryItem({
+        await upsertInventoryItem({
           ...inventoryItem,
           quantity: 2,
         });
@@ -305,7 +305,7 @@ describe("Server", () => {
           quantity: 1,
         } as InventoryItem;
 
-        await expect(createInventoryItem(inventoryItem)).rejects.toThrow(
+        await expect(upsertInventoryItem(inventoryItem)).rejects.toThrow(
           `Item not registered: fake-item-id`
         );
       });
@@ -317,7 +317,7 @@ describe("Server", () => {
             (getItemStore as jest.Mock).mockReturnValueOnce({});
 
             await expect(
-              createInventoryItem({
+              upsertInventoryItem({
                 ...inventoryItem,
                 quantity,
               })
@@ -333,7 +333,7 @@ describe("Server", () => {
             (getItemStore as jest.Mock).mockReturnValueOnce({});
 
             await expect(
-              createInventoryItem({
+              upsertInventoryItem({
                 ...inventoryItem,
                 durability,
               })
@@ -399,7 +399,7 @@ describe("Server", () => {
       (GetPlayerName as jest.Mock).mockReturnValueOnce("fake-name");
       (listInventoryItems as jest.Mock).mockReturnValueOnce([inventoryItem]);
 
-      await createInventoryItem({
+      await upsertInventoryItem({
         ...inventoryItem,
         inventoryId: "player_fake-name" as InventoryId,
       });

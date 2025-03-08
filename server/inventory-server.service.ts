@@ -46,7 +46,7 @@ export const registerItem = async (item: Partial<Item>): Promise<Item> => {
   return newItem;
 };
 
-export const createInventoryItem = async (
+export const upsertInventoryItem = async (
   inventoryItem: InventoryItem
 ): Promise<InventoryItem> => {
   const item = getItem(inventoryItem.itemId);
