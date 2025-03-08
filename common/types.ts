@@ -29,7 +29,7 @@ export type Item = {
 
 export type InventoryItem = {
   id: string;
-  inventoryId: string;
+  inventoryId: InventoryId;
   itemId: ItemId;
   quantity: number;
   durability: number;
@@ -65,3 +65,9 @@ export const ItemDefaults: Partial<Item> = {
 };
 
 export type ItemId = string & { __opaque__: "ItemId" };
+
+export type InventoryId = string & { __opaque__: "InventoryId" };
+
+export type InventoryItems = {
+  [inventoryId: InventoryId]: InventoryItem[];
+};
