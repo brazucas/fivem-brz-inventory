@@ -25,7 +25,8 @@
   "dependencies": {},
   "jest": {
     "projects": [
-      "server/jest.config.js"
+      "server/jest.config.js",
+      "client/jest.config.js"
     ]
   }
 }

@@ -10,8 +10,14 @@
     "lib": ["ES2020"],
     "paths": {
       "@/*": ["./*"],
-      "@core/*": ["../brz-core/client/*"]
+      "@core/*": ["../brz-core/client/*"],
+      "@common/*": ["../common/*"]
     }
   },
-  "include": ["./**/*", "../brz-core/client", "../brz-core/nodejs.ts"]
+  "include": [
+    "./**/*",
+    "../brz-core/client",
+    "../brz-core/nodejs.ts",
+    "../common/**/*"
+  ]
 }
