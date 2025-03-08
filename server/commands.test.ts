@@ -68,6 +68,21 @@ describe("commands", () => {
       expect(createInventoryItem).toHaveBeenCalledTimes(2);
     });
 
+    it("should notify when an error occurs while giving item", async () => {
+      (getItem as jest.Mock).mockReturnValueOnce({});
+      (createInventoryItem as jest.Mock).mockRejectedValueOnce(
+        new Error("An error occurred")
+      );
+
+      await givePlayerItemCommand(1, ["10", "item-id", "1"]);
+
+      expect(notify).toHaveBeenCalledWith(
+        1,
+        "An error occurred while giving item item-id over to player 10",
+        "error"
+      );
+    });
+
     describe("error scenarios", () => {
       afterEach(() => {
         expect(createInventoryItem).not.toHaveBeenCalled();

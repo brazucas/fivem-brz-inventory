@@ -37,26 +37,35 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
     return;
   }
 
-  await createInventoryItem({
-    id: randomUUID(),
-    durability: 100,
-    inventoryId: "player_steam-id" as InventoryId,
-    itemId,
-    quantity,
-  });
+  try {
+    await createInventoryItem({
+      id: randomUUID(),
+      durability: 100,
+      inventoryId: "player_steam-id" as InventoryId,
+      itemId,
+      quantity,
+    });
 
-  notify(
-    source,
-    `Item ${itemId} (${quantity}x) given to player ${playerId}`,
-    "success"
-  );
+    notify(
+      source,
+      `Item ${itemId} (${quantity}x) given to player ${playerId}`,
+      "success"
+    );
 
-  emitNetTyped<InternalClientEvents, "brz-inventory:itemReceived">(
-    "brz-inventory:itemReceived",
-    playerId,
-    itemId,
-    quantity
-  );
+    emitNetTyped<InternalClientEvents, "brz-inventory:itemReceived">(
+      "brz-inventory:itemReceived",
+      playerId,
+      itemId,
+      quantity
+    );
+  } catch (err) {
+    console.error(err);
+    notify(
+      source,
+      `An error occurred while giving item ${itemId} over to player ${playerId}`,
+      "error"
+    );
+  }
 };
 
 RegisterCommand("givePlayerItem", givePlayerItemCommand, false);
