@@ -68,6 +68,14 @@ export type ItemId = string & { __opaque__: "ItemId" };
 
 export type InventoryId = string & { __opaque__: "InventoryId" };
 
+export type PlayerId = number & { __opaque__: "PlayerId" };
+
+export type Quantity = number & { __opaque__: "Quantity" };
+
 export type InventoryItems = {
   [inventoryId: InventoryId]: InventoryItem[];
+};
+
+export type InternalClientEvents = {
+  "brz-inventory:itemReceived": [ItemId, Quantity];
 };
