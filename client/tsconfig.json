@@ -9,8 +9,9 @@
     "types": ["@citizenfx/client", "@types/node", "@types/jest"],
     "lib": ["ES2020"],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@core/*": ["../brz-core/client/*"]
     }
   },
-  "include": ["./**/*"]
+  "include": ["./**/*", "../brz-core/client", "../brz-core/nodejs.ts"]
 }
