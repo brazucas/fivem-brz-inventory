@@ -1,6 +1,7 @@
 import {
   InventoryId,
   InventoryItem,
+  InventoryItems,
   Item,
   ItemDefaults,
   ItemId,
@@ -9,10 +10,11 @@ import {
   RemoveItemOperationResult,
 } from "@common/types";
 import {
-  getItem,
-  registerItem as persistItem,
   createInventoryItem as createInventoryItemStore,
   getInventoryItem,
+  getItem,
+  listInventoryItems as listInventoryItemsStore,
+  registerItem as persistItem,
   subtractInventoryItem,
 } from "./adapters/memory.storage";
 
@@ -176,4 +178,4 @@ const validatePositiveIntegerParams = (item: Partial<Item>) => {
   }
 };
 
-export { getItem };
+export { getItem, listInventoryItemsStore as listInventoryItems };
