@@ -80,6 +80,12 @@ export type InventoryItems = {
     | undefined;
 };
 
+export type RemoveItemOperationResult = {
+  success: boolean;
+  removedAll: boolean;
+  remainingQuantity: number;
+};
+
 export type InternalClientEvents = {
   "brz-inventory:itemReceived": [ItemId, Quantity];
 };

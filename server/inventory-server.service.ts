@@ -1,14 +1,19 @@
 import {
+  InventoryId,
   InventoryItem,
   Item,
   ItemDefaults,
+  ItemId,
   ItemRarity,
   ItemType,
+  RemoveItemOperationResult,
 } from "@common/types";
 import {
   getItem,
   registerItem as persistItem,
   createInventoryItem as createInventoryItemStore,
+  getInventoryItem,
+  subtractInventoryItem,
 } from "./adapters/memory.storage";
 
 export const registerItem = async (item: Partial<Item>): Promise<Item> => {
@@ -31,7 +36,9 @@ export const registerItem = async (item: Partial<Item>): Promise<Item> => {
   return newItem;
 };
 
-export const createInventoryItem = async (inventoryItem: InventoryItem) => {
+export const createInventoryItem = async (
+  inventoryItem: InventoryItem
+): Promise<InventoryItem> => {
   const item = getItem(inventoryItem.itemId);
 
   const updatedInventoryItem = {
@@ -62,6 +69,32 @@ export const createInventoryItem = async (inventoryItem: InventoryItem) => {
   }
 
   await createInventoryItemStore(updatedInventoryItem);
+
+  return updatedInventoryItem;
+};
+
+export const removeInventoryItem = async (
+  inventoryId: InventoryId,
+  itemId: ItemId,
+  quantity: number
+): Promise<RemoveItemOperationResult> => {
+  const storedInventoryItem = await getInventoryItem(inventoryId, itemId);
+
+  if (!storedInventoryItem) {
+    throw new Error(`Item not found in inventory: ${itemId}`);
+  }
+
+  const deleted = await subtractInventoryItem(inventoryId, itemId, quantity);
+
+  if (!deleted) {
+    throw new Error("Failed to remove item from inventory");
+  }
+
+  return {
+    success: true,
+    remainingQuantity: storedInventoryItem.quantity - quantity,
+    removedAll: storedInventoryItem.quantity - quantity === 0,
+  };
 };
 
 const validateRequiredParams = (item: Partial<Item>) => {

@@ -5,17 +5,22 @@ import {
   registerItem,
   getItem,
   createInventoryItem,
+  removeInventoryItem,
 } from "./inventory-server.service";
 import {
   getItem as getItemStore,
   registerItem as registerItemStore,
   createInventoryItem as createInventoryItemStore,
+  subtractInventoryItem as subtractInventoryItemStore,
+  getInventoryItem as getInventoryItemStore,
 } from "./adapters/memory.storage";
 
 jest.mock("./adapters/memory.storage", () => ({
   registerItem: jest.fn(),
   getItem: jest.fn(),
   createInventoryItem: jest.fn(),
+  getInventoryItem: jest.fn(),
+  subtractInventoryItem: jest.fn(),
 }));
 
 describe("Server", () => {
@@ -327,6 +332,56 @@ describe("Server", () => {
           }
         );
       });
+    });
+  });
+
+  describe("removeInventoryItem", () => {
+    const inventoryId = "fake-inventory-id" as InventoryId;
+    const itemId = "fake-item-id" as ItemId;
+    const quantity = 1;
+
+    const inventoryItem = {
+      durability: 100,
+      id: "fake-id",
+      inventoryId,
+      itemId,
+      quantity: 1,
+    } as InventoryItem;
+
+    it("should get item and remove quantity from inventory", async () => {
+      (getInventoryItemStore as jest.Mock).mockReturnValueOnce(inventoryItem);
+      (subtractInventoryItemStore as jest.Mock).mockReturnValueOnce(true);
+
+      await removeInventoryItem(inventoryId, itemId, quantity);
+
+      expect(getInventoryItemStore as jest.Mock).toHaveBeenCalledTimes(1);
+      expect(subtractInventoryItemStore).toHaveBeenCalledTimes(1);
+
+      expect(getInventoryItemStore).toHaveBeenCalledWith(inventoryId, itemId);
+      expect(subtractInventoryItemStore).toHaveBeenCalledWith(
+        inventoryId,
+        itemId,
+        quantity
+      );
+    });
+
+    it("should throw error when item is not found in inventory", async () => {
+      (getInventoryItemStore as jest.Mock).mockReturnValueOnce(null);
+
+      await expect(
+        removeInventoryItem(inventoryId, itemId, quantity)
+      ).rejects.toThrow(`Item not found in inventory: ${itemId}`);
+
+      expect(subtractInventoryItemStore).not.toHaveBeenCalled();
+    });
+
+    it("should throw error when item is not removed from inventory", async () => {
+      (getInventoryItemStore as jest.Mock).mockReturnValueOnce(inventoryItem);
+      (subtractInventoryItemStore as jest.Mock).mockReturnValueOnce(false);
+
+      await expect(
+        removeInventoryItem(inventoryId, itemId, quantity)
+      ).rejects.toThrow("Failed to remove item from inventory");
     });
   });
 });
