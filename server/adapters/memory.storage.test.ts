@@ -34,7 +34,7 @@ describe("MemoryStorage", () => {
   });
 
   describe("createInventoryItem", () => {
-    it("should store inventory item", () => {
+    it("should store inventory item", async () => {
       const inventoryItem = {
         durability: 100,
         id: "fake-id",
@@ -43,7 +43,7 @@ describe("MemoryStorage", () => {
         quantity: 1,
       } as InventoryItem;
 
-      const storedItem = createInventoryItem(inventoryItem);
+      const storedItem = await createInventoryItem(inventoryItem);
 
       expect(storedItem).toEqual(inventoryItem);
     });
