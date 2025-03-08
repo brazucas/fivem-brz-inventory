@@ -1,43 +1,56 @@
 global.on = jest.fn();
 
-import { Item, ItemId } from "@common/types";
-import { registerItem } from "./inventory-server.service";
-import { registerItem as persistItem } from "./adapters/memory.storage";
+import { InventoryId, InventoryItem, Item, ItemId } from "@common/types";
+import {
+  registerItem,
+  getItem,
+  createInventoryItem,
+} from "./inventory-server.service";
+import {
+  getItem as getItemStore,
+  registerItem as registerItemStore,
+  createInventoryItem as createInventoryItemStore,
+} from "./adapters/memory.storage";
 
 jest.mock("./adapters/memory.storage", () => ({
   registerItem: jest.fn(),
+  getItem: jest.fn(),
+  createInventoryItem: jest.fn(),
 }));
 
 describe("Server", () => {
+  const validItem = {
+    id: "test" as ItemId,
+    name: "Test Item",
+    type: "weapon",
+    description: "A test item",
+    tier: 1,
+    rarity: "common",
+    weight: 1,
+    stackable: true,
+    decayable: false,
+    decayValue: 1,
+    decayChance: 100,
+    decayInterval: 1000,
+    decayThreshold: 1,
+    decayedItem: "test" as ItemId,
+    droppable: true,
+    groundObject: "hei_prop_hei_paper_bag",
+    usable: false,
+    initialDurability: 100,
+    tradable: false,
+  } as Item;
+
+  const positiveIntegerParamTests = [-1, 0, null, "string"];
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   describe("createItem", () => {
-    const validItem = {
-      id: "test" as ItemId,
-      name: "Test Item",
-      type: "weapon",
-      description: "A test item",
-      tier: 1,
-      rarity: "common",
-      weight: 1,
-      stackable: true,
-      decayable: false,
-      decayChance: 100,
-      decayInterval: 1000,
-      decayThreshold: 0,
-      decayedItem: "test" as ItemId,
-      droppable: true,
-      groundObject: "hei_prop_hei_paper_bag",
-      usable: false,
-      initialDurability: 100,
-      tradable: false,
-    } as Item;
-
     it("should create a new item", async () => {
       expect(await registerItem(validItem)).toEqual(validItem);
-      expect(persistItem).toHaveBeenCalledWith(validItem);
+      expect(registerItemStore).toHaveBeenCalledWith(validItem);
     });
 
     describe("Required params", () => {
@@ -52,20 +65,42 @@ describe("Server", () => {
       );
     });
 
+    describe("item param value type validation", () => {
+      describe.each([
+        "decayValue",
+        "decayInterval",
+        "decayChance",
+        "decayThreshold",
+        "weight",
+        "tier",
+      ])("%s", (param) => {
+        test.each(positiveIntegerParamTests)(
+          `should throw error when ${param} is %s`,
+          async (paramValue) => {
+            const invalidItem = { ...validItem, [param]: paramValue } as Item;
+            await expect(registerItem(invalidItem)).rejects.toThrow(
+              `Item ${param} must be a positive integer`
+            );
+          }
+        );
+      });
+    });
+
     describe("Decayable items", () => {
       test.each([
         "decayChance",
         "decayInterval",
         "decayThreshold",
         "decayedItem",
-      ])(
-        "should throw an error if decayable and %s is missing",
+      ] as (keyof Item)[])(
+        "should throw an error if decayable is true and %s is missing",
         async (paramToInvalidate) => {
           const invalidItem = {
             ...validItem,
             decayable: true,
             [paramToInvalidate]: undefined,
           };
+
           await expect(registerItem(invalidItem)).rejects.toThrow(
             "Decayable items require decayChance, decayInterval, decayThreshold, and decayedItem"
           );
@@ -78,7 +113,7 @@ describe("Server", () => {
           decayable: true,
           decayChance: 100,
           decayInterval: 1000,
-          decayThreshold: 0,
+          decayThreshold: 1,
           decayedItem: "test" as ItemId,
         };
         await expect(registerItem(validDecayableItem)).resolves.not.toThrow();
@@ -132,12 +167,15 @@ describe("Server", () => {
     });
 
     describe("Item tier", () => {
-      test.each([0, 6])("should throw an error if tier is %i", async (tier) => {
-        const invalidItem = { ...validItem, tier } as Item;
-        await expect(registerItem(invalidItem)).rejects.toThrow(
-          "Item tier must be between 1 and 5"
-        );
-      });
+      test.each([6, 7, 8])(
+        "should throw an error if tier is %i",
+        async (tier) => {
+          const invalidItem = { ...validItem, tier } as Item;
+          await expect(registerItem(invalidItem)).rejects.toThrow(
+            "Item tier must be between 1 and 5"
+          );
+        }
+      );
 
       test.each([1, 2, 3, 4, 5])(
         "should not throw an error if tier is %i",
@@ -185,6 +223,6 @@ describe("Server", () => {
           type: "weapon",
         } as Item;
         await expect(registerItem(validTypeItem)).resolves.not.toThrow();
-      });
     });
+  });
 });

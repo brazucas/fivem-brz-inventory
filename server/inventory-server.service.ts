@@ -1,5 +1,15 @@
-import { Item, ItemDefaults, ItemRarity, ItemType } from "@common/types";
-import { registerItem as persistItem } from "./adapters/memory.storage";
+import {
+  InventoryItem,
+  Item,
+  ItemDefaults,
+  ItemRarity,
+  ItemType,
+} from "@common/types";
+import {
+  getItem,
+  registerItem as persistItem,
+  createInventoryItem as createInventoryItemStore,
+} from "./adapters/memory.storage";
 
 export const registerItem = async (item: Partial<Item>): Promise<Item> => {
   const newItem = {
@@ -8,6 +18,7 @@ export const registerItem = async (item: Partial<Item>): Promise<Item> => {
   } as Item;
 
   validateRequiredParams(newItem);
+  validatePositiveIntegerParams(newItem);
   validateDecayableItem(newItem);
   validateDroppableItem(newItem);
   validateUsableItem(newItem);
@@ -79,3 +90,24 @@ const validateItemType = (type: keyof typeof ItemType) => {
     throw new Error("Invalid item type");
   }
 };
+
+const validatePositiveIntegerParams = (item: Partial<Item>) => {
+  const positiveIntegerParams: (keyof Item)[] = [
+    "decayValue",
+    "decayInterval",
+    "decayChance",
+    "decayThreshold",
+    "weight",
+    "tier",
+  ];
+
+  for (const param of positiveIntegerParams) {
+    const value = item[param] as any;
+
+    if (typeof item[param] !== "undefined" && (isNaN(value) || value < 1)) {
+      throw new Error(`Item ${param} must be a positive integer`);
+    }
+  }
+};
+
+export { getItem };
