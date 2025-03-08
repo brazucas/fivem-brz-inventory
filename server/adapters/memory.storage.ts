@@ -28,6 +28,31 @@ export const createInventoryItem = async (inventoryItem: InventoryItem) => {
   return inventoryItem;
 };
 
+export const updateInventoryItem = async (
+  inventoryItem: InventoryItem
+): Promise<InventoryItem> => {
+  const storedInventoryItem = await getInventoryItem(
+    inventoryItem.inventoryId,
+    inventoryItem.itemId
+  );
+
+  if (!storedInventoryItem) {
+    throw new Error(
+      `Item ${inventoryItem.itemId} not found in inventory ${inventoryItem.inventoryId} `
+    );
+  }
+
+  const updatedInventoryItem = {
+    ...storedInventoryItem,
+    ...inventoryItem,
+  };
+
+  inventoryItemsStore[inventoryItem.inventoryId]![inventoryItem.itemId] =
+    updatedInventoryItem;
+
+  return updatedInventoryItem;
+};
+
 export const listInventoryItems = async (
   inventoryId: InventoryId
 ): Promise<InventoryItems[]> => {

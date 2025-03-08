@@ -7,6 +7,7 @@ import {
   subtractInventoryItem,
   getInventoryItem,
   inventoryExists,
+  updateInventoryItem,
 } from "./memory.storage";
 
 describe("MemoryStorage", () => {
@@ -175,6 +176,37 @@ describe("MemoryStorage", () => {
       expect(
         await inventoryExists("random-inventory-id" as InventoryId)
       ).toBeFalsy();
+    });
+  });
+
+  describe("updateInventoryItem", () => {
+    it("should update inventory item", async () => {
+      const updatedItem = {
+        ...inventoryItem,
+        quantity: 2,
+      };
+
+      await createInventoryItem(inventoryItem);
+
+      const result = await updateInventoryItem(updatedItem);
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: inventoryItem.id,
+          quantity: 2,
+        })
+      );
+    });
+
+    it("should throw an error when item doesn't exist", async () => {
+      await expect(
+        updateInventoryItem({
+          ...inventoryItem,
+          itemId: "random-item-id" as ItemId,
+        })
+      ).rejects.toThrow(
+        `Item random-item-id not found in inventory fake-inventory-id`
+      );
     });
   });
 });
