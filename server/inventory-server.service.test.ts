@@ -1,4 +1,6 @@
 global.on = jest.fn();
+global.getPlayers = jest.fn();
+global.GetPlayerName = jest.fn();
 
 import { InventoryId, InventoryItem, Item, ItemId } from "@common/types";
 import {
@@ -13,7 +15,9 @@ import {
   createInventoryItem as createInventoryItemStore,
   subtractInventoryItem as subtractInventoryItemStore,
   getInventoryItem as getInventoryItemStore,
+  listInventoryItems,
 } from "./adapters/memory.storage";
+import { emitNetTyped } from "@core/helpers/cfx";
 
 jest.mock("./adapters/memory.storage", () => ({
   registerItem: jest.fn(),
@@ -21,6 +25,11 @@ jest.mock("./adapters/memory.storage", () => ({
   createInventoryItem: jest.fn(),
   getInventoryItem: jest.fn(),
   subtractInventoryItem: jest.fn(),
+  listInventoryItems: jest.fn(),
+}));
+
+jest.mock("@core/helpers/cfx", () => ({
+  emitNetTyped: jest.fn(),
 }));
 
 describe("Server", () => {
@@ -382,6 +391,22 @@ describe("Server", () => {
       await expect(
         removeInventoryItem(inventoryId, itemId, quantity)
       ).rejects.toThrow("Failed to remove item from inventory");
+    });
+
+    it("should emit event to sync player inventory state when inventory id starts with player_", async () => {
+      (getItem as jest.Mock).mockReturnValueOnce({});
+      (getPlayers as jest.Mock).mockReturnValueOnce(["10"]);
+      (GetPlayerName as jest.Mock).mockReturnValueOnce("fake-name");
+      (listInventoryItems as jest.Mock).mockReturnValueOnce([inventoryItem]);
+
+      await createInventoryItem({
+        ...inventoryItem,
+        inventoryId: "player_fake-name" as InventoryId,
+      });
+
+      expect(emitNetTyped).toHaveBeenCalledWith("brz-inventory:setState", 10, {
+        0: inventoryItem,
+      });
     });
   });
 });

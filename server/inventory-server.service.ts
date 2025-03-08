@@ -190,7 +190,7 @@ const validatePositiveIntegerParams = (item: Partial<Item>) => {
 };
 
 const syncPlayerInventoryState = async (playerInventoryIndex: InventoryId) => {
-  const [inventoryType, playerName] = playerInventoryIndex.split("_")[1];
+  const [inventoryType, playerName] = playerInventoryIndex.split("_");
 
   if (inventoryType !== InventoryType.player) {
     return;
