@@ -223,6 +223,110 @@ describe("Server", () => {
           type: "weapon",
         } as Item;
         await expect(registerItem(validTypeItem)).resolves.not.toThrow();
+      });
+    });
+  });
+
+  describe("getItem", () => {
+    it("should get previously registered item", () => {
+      (getItemStore as jest.Mock).mockReturnValueOnce({});
+
+      getItem("fake-id");
+
+      expect(getItemStore).toHaveBeenCalledTimes(1);
+      expect(getItemStore).toHaveBeenCalledWith("fake-id");
+    });
+  });
+
+  describe("createInventoryItem", () => {
+    const inventoryItem = {
+      durability: 100,
+      id: "fake-id",
+      inventoryId: "fake-inventory-id" as InventoryId,
+      itemId: "fake-item-id" as ItemId,
+      quantity: 1,
+    } as InventoryItem;
+    describe("successful scenarios", () => {
+      afterEach(() => {
+        expect(createInventoryItemStore).toHaveBeenCalledTimes(1);
+        expect(createInventoryItemStore).toHaveBeenCalledWith(inventoryItem);
+      });
+
+      it("should create inventory item and persist its state when item is valid", async () => {
+        (getItemStore as jest.Mock).mockReturnValueOnce({});
+        await createInventoryItem(inventoryItem);
+      });
+
+      it("should log warn message when trying to create an item with quantity higher than 1 and item is not stackable", async () => {
+        const consoleWarn = jest.spyOn(global.console, "warn");
+
+        (getItemStore as jest.Mock).mockReturnValueOnce({
+          stackable: false,
+        });
+
+        await createInventoryItem({
+          ...inventoryItem,
+          quantity: 2,
+        });
+
+        expect(consoleWarn).toHaveBeenCalledWith(
+          "Attempting to give multiple non-stackable items: fake-item-id. Only one will be added."
+        );
+      });
+    });
+
+    describe("error scenarios", () => {
+      afterEach(() => {
+        expect(createInventoryItemStore).not.toHaveBeenCalled();
+      });
+
+      it("should throw error when trying to create inventory item when it's not registered", async () => {
+        (getItemStore as jest.Mock).mockReturnValueOnce(null);
+
+        const inventoryItem = {
+          durability: 100,
+          id: "fake-id",
+          inventoryId: "fake-inventory-id" as InventoryId,
+          itemId: "fake-item-id" as ItemId,
+          quantity: 1,
+        } as InventoryItem;
+
+        await expect(createInventoryItem(inventoryItem)).rejects.toThrow(
+          `Item not registered: fake-item-id`
+        );
+      });
+
+      describe("quantity validation", () => {
+        test.each(positiveIntegerParamTests)(
+          "should throw error when item quantity is %s",
+          async (quantity: any) => {
+            (getItemStore as jest.Mock).mockReturnValueOnce({});
+
+            await expect(
+              createInventoryItem({
+                ...inventoryItem,
+                quantity,
+              })
+            ).rejects.toThrow("Quantity must be a number greater than 0");
+          }
+        );
+      });
+
+      describe("durability validation", () => {
+        test.each([...positiveIntegerParamTests, 101])(
+          "should throw error when item durability is %s",
+          async (durability: any) => {
+            (getItemStore as jest.Mock).mockReturnValueOnce({});
+
+            await expect(
+              createInventoryItem({
+                ...inventoryItem,
+                durability,
+              })
+            ).rejects.toThrow("Durability must be a number between 1 and 100");
+          }
+        );
+      });
     });
   });
 });

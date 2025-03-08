@@ -31,6 +31,39 @@ export const registerItem = async (item: Partial<Item>): Promise<Item> => {
   return newItem;
 };
 
+export const createInventoryItem = async (inventoryItem: InventoryItem) => {
+  const item = getItem(inventoryItem.itemId);
+
+  const updatedInventoryItem = {
+    ...inventoryItem,
+  };
+
+  if (!item) {
+    throw new Error(`Item not registered: ${inventoryItem.itemId}`);
+  }
+
+  if (inventoryItem.quantity < 1 || isNaN(inventoryItem.quantity)) {
+    throw new Error("Quantity must be a number greater than 0");
+  }
+
+  if (
+    inventoryItem.durability < 1 ||
+    isNaN(inventoryItem.durability) ||
+    inventoryItem.durability > 100
+  ) {
+    throw new Error("Durability must be a number between 1 and 100");
+  }
+
+  if (inventoryItem.quantity > 1 && !item.stackable) {
+    console.warn(
+      `Attempting to give multiple non-stackable items: ${inventoryItem.itemId}. Only one will be added.`
+    );
+    updatedInventoryItem.quantity = 1;
+  }
+
+  await createInventoryItemStore(updatedInventoryItem);
+};
+
 const validateRequiredParams = (item: Partial<Item>) => {
   const requiredParams: (keyof Item)[] = [
     "id",
