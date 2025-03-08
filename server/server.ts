@@ -2,8 +2,7 @@ declare const ITEMS: Item[];
 
 import { Item } from "@common/types";
 import { registerItem } from "./inventory-server.service";
-import { Item, ItemDefaults, ItemRarity, ItemType } from "@common/types";
-import { createItem as persistItem } from "./adapters/memory.storage";
+import "./commands";
 
 export const onResourceStart = async (resName: string) => {
   if (resName === GetCurrentResourceName()) {
