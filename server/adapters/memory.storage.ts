@@ -63,3 +63,7 @@ export const getInventoryItem = async (
   itemId: ItemId
 ): Promise<InventoryItem | null> =>
   inventoryItemsStore[inventoryId]?.[itemId] || null;
+
+export const inventoryExists = async (
+  inventoryId: InventoryId
+): Promise<boolean> => !!inventoryItemsStore[inventoryId];

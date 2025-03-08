@@ -6,6 +6,7 @@ import {
   listInventoryItems,
   deleteInventoryItem,
   getInventoryItem,
+  inventoryExists,
 } from "./memory.storage";
 
 describe("MemoryStorage", () => {
@@ -160,6 +161,20 @@ describe("MemoryStorage", () => {
           "random-item-id" as ItemId
         )
       ).toBeNull();
+    });
+  });
+
+  describe("inventoryExists", () => {
+    it("should return true when inventory exists", async () => {
+      await createInventoryItem(inventoryItem);
+
+      expect(await inventoryExists(inventoryItem.inventoryId)).toBeTruthy();
+    });
+
+    it("should return false when inventory doesn't exist", async () => {
+      expect(
+        await inventoryExists("random-inventory-id" as InventoryId)
+      ).toBeFalsy();
     });
   });
 });
