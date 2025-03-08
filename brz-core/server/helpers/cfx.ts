@@ -18,3 +18,6 @@ export const onNetTyped = <
 ) => {
   onNet(eventName, func);
 };
+
+export const isPlayerConnected = (playerId: string) =>
+  GetPlayerName(playerId) !== undefined;

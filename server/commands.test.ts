@@ -1,16 +1,19 @@
 global.RegisterCommand = jest.fn();
 
-import { emitNetTyped } from "@core/helpers/cfx";
+import { isPlayerConnected } from "@core/helpers/cfx";
+import { notify } from "@core/notification";
 import { givePlayerItemCommand } from "./commands";
 import { createInventoryItem, getItem } from "./inventory-server.service";
-import { notify } from "@core/notification";
 
 jest.mock("./inventory-server.service", () => ({
   createInventoryItem: jest.fn(),
   getItem: jest.fn(),
 }));
 
-jest.mock("@core/helpers/cfx", () => ({ emitNetTyped: jest.fn() }));
+jest.mock("@core/helpers/cfx", () => ({
+  emitNetTyped: jest.fn(),
+  isPlayerConnected: jest.fn().mockReturnValue(true),
+}));
 
 jest.mock("@core/notification", () => ({
   notify: jest.fn(),
@@ -66,6 +69,18 @@ describe("commands", () => {
       );
 
       expect(createInventoryItem).toHaveBeenCalledTimes(2);
+    });
+
+    it("should notify when target player is not connected", async () => {
+      (isPlayerConnected as jest.Mock).mockReturnValueOnce(false);
+
+      await givePlayerItemCommand(1, ["10", "item-id", "1"]);
+
+      expect(notify).toHaveBeenCalledWith(
+        1,
+        "Player id 10 is not connected",
+        "error"
+      );
     });
 
     it("should notify when an error occurs while giving item", async () => {

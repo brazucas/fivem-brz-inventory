@@ -5,7 +5,7 @@ import {
   Quantity,
 } from "@common/types";
 import { createInventoryItem, getItem } from "./inventory-server.service";
-import { emitNetTyped } from "@core/helpers/cfx";
+import { emitNetTyped, isPlayerConnected } from "@core/helpers/cfx";
 import { notify } from "@core/notification";
 import { randomUUID } from "crypto";
 
@@ -19,7 +19,7 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
     return;
   }
 
-  const playerId = parseInt(args[0]);
+  const playerId = String(args[0]);
   const itemId = String(args[1]) as ItemId;
   const quantity = parseInt(args[2]) as Quantity;
 
@@ -27,6 +27,11 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
     emitNet("chat:addMessage", source, {
       args: ["Invalid arguments"],
     });
+    return;
+  }
+
+  if (!isPlayerConnected(playerId)) {
+    notify(source, `Player id ${playerId} is not connected`, "error");
     return;
   }
 
@@ -54,7 +59,7 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
 
     emitNetTyped<InternalClientEvents, "brz-inventory:itemReceived">(
       "brz-inventory:itemReceived",
-      playerId,
+      Number(playerId),
       itemId,
       quantity
     );
