@@ -21,3 +21,6 @@ export const onNetTyped = <
 
 export const isPlayerConnected = (playerId: string) =>
   GetPlayerName(playerId) !== undefined;
+
+export const getPlayerSteamId = (playerId: string): string | null =>
+  GetPlayerIdentifierByType(playerId, "steam");

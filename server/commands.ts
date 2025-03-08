@@ -4,7 +4,11 @@ import {
   ItemId,
   Quantity,
 } from "@common/types";
-import { createInventoryItem, getItem } from "./inventory-server.service";
+import {
+  createInventoryItem,
+  getItem,
+  removeInventoryItem,
+} from "./inventory-server.service";
 import { emitNetTyped, isPlayerConnected } from "@core/helpers/cfx";
 import { notify } from "@core/notification";
 import { randomUUID } from "crypto";
@@ -23,13 +27,6 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
   const itemId = String(args[1]) as ItemId;
   const quantity = parseInt(args[2]) as Quantity;
 
-  if (!playerId || !itemId || !quantity) {
-    emitNet("chat:addMessage", source, {
-      args: ["Invalid arguments"],
-    });
-    return;
-  }
-
   if (!isPlayerConnected(playerId)) {
     notify(source, `Player id ${playerId} is not connected`, "error");
     return;
@@ -47,7 +44,7 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
     await createInventoryItem({
       id: randomUUID(),
       durability: 100,
-      inventoryId: "player_steam-id" as InventoryId,
+      inventoryId: `player_${playerName}` as InventoryId,
       itemId,
       quantity,
     });
@@ -74,4 +71,57 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
   }
 };
 
+export const removePlayerItemCommand = async (
+  source: number,
+  args: string[]
+) => {
+  if (args.length < 3) {
+    notify(
+      source,
+      `Invalid number of arguments, expected: 3, received: ${args.length}`,
+      "error"
+    );
+    return;
+  }
+
+  const playerId = String(args[0]);
+  const itemId = String(args[1]) as ItemId;
+  const quantity = parseInt(args[2]) as Quantity;
+
+  if (!isPlayerConnected(playerId)) {
+    notify(source, `Player id ${playerId} is not connected`, "error");
+    return;
+  }
+
+  const playerName = GetPlayerName(playerId);
+  const inventoryItem = getItem(itemId);
+
+  if (!inventoryItem) {
+    notify(source, `The item ${itemId} doesn't exists`, "error");
+    return;
+  }
+
+  try {
+    await removeInventoryItem(
+      `player_${playerName}` as InventoryId,
+      itemId,
+      quantity
+    );
+
+    notify(
+      source,
+      `Removed item ${itemId} (${quantity}x) from ${playerName}`,
+      "success"
+    );
+  } catch (err) {
+    console.error(err);
+    notify(
+      source,
+      `An error occurred while removing item ${itemId} from ${playerName}`,
+      "error"
+    );
+  }
+};
+
 RegisterCommand("givePlayerItem", givePlayerItemCommand, false);
+RegisterCommand("removePlayerItem", removePlayerItemCommand, false);
