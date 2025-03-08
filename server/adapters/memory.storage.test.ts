@@ -4,6 +4,8 @@ import {
   getItem,
   createInventoryItem,
   listInventoryItems,
+  deleteInventoryItem,
+  getInventoryItem,
 } from "./memory.storage";
 
 describe("MemoryStorage", () => {
@@ -32,6 +34,10 @@ describe("MemoryStorage", () => {
     quantity: 1,
   } as InventoryItem;
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe("registerItem", () => {
     it("should store a new item", async () => {
       const item = await registerItem(props);
@@ -43,6 +49,10 @@ describe("MemoryStorage", () => {
     it("should retriave a stored item", async () => {
       const item = await registerItem(props as Item);
       expect(getItem("test")).toEqual(props);
+    });
+
+    it("should return null when item doesn't exist", async () => {
+      expect(getItem("random-id")).toBeNull();
     });
   });
 
@@ -79,6 +89,77 @@ describe("MemoryStorage", () => {
           }),
         ])
       );
+    });
+
+    it("should return empty array when inventory doesn't exist", async () => {
+      expect(
+        await listInventoryItems("random-inventory-id" as InventoryId)
+      ).toEqual([]);
+    });
+  });
+
+  describe("deleteInventoryItem", () => {
+    it("should subtract inventory item quantity and return true when item exists and has enough quantity to subtract", async () => {
+      const item = {
+        ...inventoryItem,
+        quantity: 2,
+      };
+
+      await createInventoryItem(item);
+
+      expect(
+        await deleteInventoryItem(item.inventoryId, item.itemId, 1)
+      ).toBeTruthy();
+
+      expect(await getInventoryItem(item.inventoryId, item.itemId)).toEqual(
+        expect.objectContaining({
+          quantity: 1,
+        })
+      );
+    });
+
+    it("should return false when item doesn't exist", async () => {
+      expect(
+        await deleteInventoryItem(
+          "random-inventory-id" as InventoryId,
+          "random-item-id" as ItemId,
+          1
+        )
+      ).toBeFalsy();
+    });
+
+    it("should delete item when quantity is 0", async () => {
+      const item = {
+        ...inventoryItem,
+        quantity: 1,
+      };
+
+      await createInventoryItem(item);
+
+      expect(
+        await deleteInventoryItem(item.inventoryId, item.itemId, 1)
+      ).toBeTruthy();
+
+      expect(await getInventoryItem(item.inventoryId, item.itemId)).toBeNull();
+    });
+  });
+
+  describe("getInventoryItem", () => {
+    it("should return inventory item when it exists", async () => {
+      await createInventoryItem(inventoryItem);
+
+      expect(
+        await getInventoryItem(inventoryItem.inventoryId, inventoryItem.itemId)
+      ).toEqual(inventoryItem);
+    });
+
+    it("should return null when inventory item doesn't exist", async () => {
+      expect(
+        await getInventoryItem(
+          "random-inventory-id" as InventoryId,
+          "random-item-id" as ItemId
+        )
+      ).toBeNull();
     });
   });
 });

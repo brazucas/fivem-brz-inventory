@@ -73,7 +73,11 @@ export type PlayerId = number & { __opaque__: "PlayerId" };
 export type Quantity = number & { __opaque__: "Quantity" };
 
 export type InventoryItems = {
-  [inventoryId: InventoryId]: InventoryItem[];
+  [inventoryId: InventoryId]:
+    | {
+        [itemId: ItemId]: InventoryItem;
+      }
+    | undefined;
 };
 
 export type InternalClientEvents = {
