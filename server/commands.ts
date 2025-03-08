@@ -35,6 +35,7 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
     return;
   }
 
+  const playerName = GetPlayerName(playerId);
   const inventoryItem = getItem(itemId);
 
   if (!inventoryItem) {
@@ -53,7 +54,7 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
 
     notify(
       source,
-      `Item ${itemId} (${quantity}x) given to player ${playerId}`,
+      `Item ${itemId} (${quantity}x) given to player ${playerName}`,
       "success"
     );
 
@@ -67,7 +68,7 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
     console.error(err);
     notify(
       source,
-      `An error occurred while giving item ${itemId} over to player ${playerId}`,
+      `An error occurred while giving item ${itemId} over to player ${playerName}`,
       "error"
     );
   }

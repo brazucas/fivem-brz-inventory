@@ -1,4 +1,5 @@
 global.RegisterCommand = jest.fn();
+global.GetPlayerName = jest.fn().mockReturnValue("player-name");
 
 import { isPlayerConnected } from "@core/helpers/cfx";
 import { notify } from "@core/notification";
@@ -40,7 +41,7 @@ describe("commands", () => {
 
       expect(notify).toHaveBeenCalledWith(
         1,
-        "Item item-id (1x) given to player 10",
+        "Item item-id (1x) given to player player-name",
         "success"
       );
     });
@@ -93,7 +94,7 @@ describe("commands", () => {
 
       expect(notify).toHaveBeenCalledWith(
         1,
-        "An error occurred while giving item item-id over to player 10",
+        "An error occurred while giving item item-id over to player player-name",
         "error"
       );
     });
