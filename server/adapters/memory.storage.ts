@@ -1,4 +1,9 @@
-import { InventoryItem, InventoryItems, Item } from "@common/types";
+import {
+  InventoryId,
+  InventoryItem,
+  InventoryItems,
+  Item,
+} from "@common/types";
 
 const itemIdIndex: { [id: string]: Item } = {};
 
@@ -20,3 +25,7 @@ export const createInventoryItem = async (inventoryItem: InventoryItem) => {
 
   return inventoryItem;
 };
+
+export const listInventoryItems = async (
+  inventoryId: InventoryId
+): Promise<InventoryItems[]> => inventoryItemsStore[inventoryId] || [];

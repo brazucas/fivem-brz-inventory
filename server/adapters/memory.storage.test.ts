@@ -1,5 +1,10 @@
 import { InventoryId, InventoryItem, Item, ItemId } from "@common/types";
-import { registerItem, getItem, createInventoryItem } from "./memory.storage";
+import {
+  registerItem,
+  getItem,
+  createInventoryItem,
+  listInventoryItems,
+} from "./memory.storage";
 
 describe("MemoryStorage", () => {
   const props = {
@@ -19,6 +24,14 @@ describe("MemoryStorage", () => {
     tradable: false,
   } as Item;
 
+  const inventoryItem = {
+    durability: 100,
+    id: "fake-id",
+    inventoryId: "fake-inventory-id" as InventoryId,
+    itemId: "fake-item-id" as ItemId,
+    quantity: 1,
+  } as InventoryItem;
+
   describe("registerItem", () => {
     it("should store a new item", async () => {
       const item = await registerItem(props);
@@ -35,17 +48,37 @@ describe("MemoryStorage", () => {
 
   describe("createInventoryItem", () => {
     it("should store inventory item", async () => {
-      const inventoryItem = {
-        durability: 100,
-        id: "fake-id",
-        inventoryId: "fake-inventory-id" as InventoryId,
-        itemId: "fake-item-id" as ItemId,
-        quantity: 1,
-      } as InventoryItem;
-
       const storedItem = await createInventoryItem(inventoryItem);
 
       expect(storedItem).toEqual(inventoryItem);
+    });
+  });
+
+  describe("listInventoryItems", () => {
+    it("should return list of inventory items previously registered for inventory id", async () => {
+      const item1 = {
+        ...inventoryItem,
+        itemId: "item-id-1" as ItemId,
+      };
+
+      const item2 = {
+        ...inventoryItem,
+        itemId: "item-id-2" as ItemId,
+      };
+
+      await createInventoryItem(item1);
+      await createInventoryItem(item2);
+
+      expect(await listInventoryItems(inventoryItem.inventoryId)).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            itemId: "item-id-1",
+          }),
+          expect.objectContaining({
+            itemId: "item-id-2",
+          }),
+        ])
+      );
     });
   });
 });
