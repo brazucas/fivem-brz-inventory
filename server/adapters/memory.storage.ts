@@ -38,7 +38,7 @@ export const listInventoryItems = async (
   return Object.values(inventoryItemsStore[inventoryId]!);
 };
 
-export const deleteInventoryItem = async (
+export const subtractInventoryItem = async (
   inventoryId: InventoryId,
   itemId: ItemId,
   quantity: number

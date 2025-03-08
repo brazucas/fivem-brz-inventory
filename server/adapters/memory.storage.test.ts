@@ -4,7 +4,7 @@ import {
   getItem,
   createInventoryItem,
   listInventoryItems,
-  deleteInventoryItem,
+  subtractInventoryItem,
   getInventoryItem,
   inventoryExists,
 } from "./memory.storage";
@@ -109,7 +109,7 @@ describe("MemoryStorage", () => {
       await createInventoryItem(item);
 
       expect(
-        await deleteInventoryItem(item.inventoryId, item.itemId, 1)
+        await subtractInventoryItem(item.inventoryId, item.itemId, 1)
       ).toBeTruthy();
 
       expect(await getInventoryItem(item.inventoryId, item.itemId)).toEqual(
@@ -121,7 +121,7 @@ describe("MemoryStorage", () => {
 
     it("should return false when item doesn't exist", async () => {
       expect(
-        await deleteInventoryItem(
+        await subtractInventoryItem(
           "random-inventory-id" as InventoryId,
           "random-item-id" as ItemId,
           1
@@ -138,7 +138,7 @@ describe("MemoryStorage", () => {
       await createInventoryItem(item);
 
       expect(
-        await deleteInventoryItem(item.inventoryId, item.itemId, 1)
+        await subtractInventoryItem(item.inventoryId, item.itemId, 1)
       ).toBeTruthy();
 
       expect(await getInventoryItem(item.inventoryId, item.itemId)).toBeNull();
