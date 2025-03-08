@@ -5,7 +5,7 @@ import { isPlayerConnected } from "@core/helpers/cfx";
 import { notify } from "@core/notification";
 import { givePlayerItemCommand, removePlayerItemCommand } from "./commands";
 import {
-  createInventoryItem,
+  upsertInventoryItem,
   getItem,
   removeInventoryItem,
 } from "./inventory-server.service";
@@ -36,7 +36,7 @@ describe("commands", () => {
 
       await givePlayerItemCommand(1, ["10", "item-id", "1"]);
 
-      expect(createInventoryItem).toHaveBeenCalledWith({
+      expect(upsertInventoryItem).toHaveBeenCalledWith({
         id: expect.any(String),
         inventoryId: "player_player-name",
         itemId: "item-id",
@@ -56,25 +56,25 @@ describe("commands", () => {
       (getItem as jest.Mock).mockReturnValueOnce({});
 
       await givePlayerItemCommand(1, ["10", "item-id", "1"]);
-      const generatedItemId = (createInventoryItem as jest.Mock).mock
+      const generatedItemId = (upsertInventoryItem as jest.Mock).mock
         .calls[0][0].id;
 
       await givePlayerItemCommand(1, ["11", "item-id", "1"]);
-      expect(createInventoryItem).toHaveBeenNthCalledWith(
+      expect(upsertInventoryItem).toHaveBeenNthCalledWith(
         1,
         expect.objectContaining({
           id: generatedItemId,
         })
       );
 
-      expect(createInventoryItem).not.toHaveBeenNthCalledWith(
+      expect(upsertInventoryItem).not.toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({
           id: generatedItemId,
         })
       );
 
-      expect(createInventoryItem).toHaveBeenCalledTimes(2);
+      expect(upsertInventoryItem).toHaveBeenCalledTimes(2);
     });
 
     it("should notify when target player is not connected", async () => {
@@ -91,7 +91,7 @@ describe("commands", () => {
 
     it("should notify when an error occurs while giving item", async () => {
       (getItem as jest.Mock).mockReturnValueOnce({});
-      (createInventoryItem as jest.Mock).mockRejectedValueOnce(
+      (upsertInventoryItem as jest.Mock).mockRejectedValueOnce(
         new Error("An error occurred")
       );
 
@@ -106,7 +106,7 @@ describe("commands", () => {
 
     describe("error scenarios", () => {
       afterEach(() => {
-        expect(createInventoryItem).not.toHaveBeenCalled();
+        expect(upsertInventoryItem).not.toHaveBeenCalled();
       });
 
       it("should notify an error when item doesn't exist", async () => {

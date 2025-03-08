@@ -3,7 +3,7 @@ import { emitNetTyped, isPlayerConnected } from "@core/helpers/cfx";
 import { notify } from "@core/notification";
 import { randomUUID } from "crypto";
 import {
-  createInventoryItem,
+  upsertInventoryItem,
   getItem,
   getPlayerInventoryId,
   removeInventoryItem,
@@ -19,7 +19,7 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
   const { playerId, itemId, quantity, playerName } = attributes;
 
   try {
-    await createInventoryItem({
+    await upsertInventoryItem({
       id: randomUUID(),
       durability: 100,
       inventoryId: getPlayerInventoryId(playerId),
