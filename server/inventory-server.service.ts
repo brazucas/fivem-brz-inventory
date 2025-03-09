@@ -12,7 +12,7 @@ import {
 } from "@common/types";
 import { emitNetTyped } from "@core/helpers/cfx";
 import {
-  createInventoryItem as createInventoryItemStore,
+  upsertInventoryItem as upsertInventoryItemStore,
   getInventoryItem,
   getItem,
   listInventoryItems,

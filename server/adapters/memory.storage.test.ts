@@ -2,7 +2,7 @@ import { InventoryId, InventoryItem, Item, ItemId } from "@common/types";
 import {
   registerItem,
   getItem,
-  createInventoryItem,
+  upsertInventoryItem,
   listInventoryItems,
   subtractInventoryItem,
   getInventoryItem,
@@ -51,7 +51,7 @@ describe("MemoryStorage", () => {
     });
   });
 
-  describe("createInventoryItem", () => {
+  describe("upsertInventoryItem", () => {
     it("should store inventory item", async () => {
       const inventoryItem = {
         durability: 100,
@@ -61,7 +61,7 @@ describe("MemoryStorage", () => {
         quantity: 1,
       } as InventoryItem;
 
-      const storedItem = await createInventoryItem(inventoryItem);
+      const storedItem = await upsertInventoryItem(inventoryItem);
 
       expect(storedItem).toEqual(inventoryItem);
     });
@@ -75,8 +75,8 @@ describe("MemoryStorage", () => {
         quantity: 1,
       } as InventoryItem;
 
-      await createInventoryItem(inventoryItem);
-      await createInventoryItem(inventoryItem);
+      await upsertInventoryItem(inventoryItem);
+      await upsertInventoryItem(inventoryItem);
 
       const storedItem = await getInventoryItem(
         inventoryItem.inventoryId,
@@ -108,8 +108,8 @@ describe("MemoryStorage", () => {
         itemId: "item-id-2" as ItemId,
       };
 
-      await createInventoryItem(item1);
-      await createInventoryItem(item2);
+      await upsertInventoryItem(item1);
+      await upsertInventoryItem(item2);
 
       expect(await listInventoryItems(inventoryItem.inventoryId)).toEqual(
         expect.arrayContaining([
@@ -145,7 +145,7 @@ describe("MemoryStorage", () => {
         quantity: 2,
       };
 
-      await createInventoryItem(item);
+      await upsertInventoryItem(item);
 
       expect(
         await subtractInventoryItem(item.inventoryId, item.itemId, 1)
@@ -182,7 +182,7 @@ describe("MemoryStorage", () => {
         quantity: 1,
       };
 
-      await createInventoryItem(item);
+      await upsertInventoryItem(item);
 
       expect(
         await subtractInventoryItem(item.inventoryId, item.itemId, 1)
@@ -202,7 +202,7 @@ describe("MemoryStorage", () => {
         quantity: 1,
       } as InventoryItem;
 
-      await createInventoryItem(inventoryItem);
+      await upsertInventoryItem(inventoryItem);
 
       expect(
         await getInventoryItem(inventoryItem.inventoryId, inventoryItem.itemId)
@@ -229,7 +229,7 @@ describe("MemoryStorage", () => {
         quantity: 1,
       } as InventoryItem;
 
-      await createInventoryItem(inventoryItem);
+      await upsertInventoryItem(inventoryItem);
 
       expect(await inventoryExists(inventoryItem.inventoryId)).toBeTruthy();
     });
@@ -256,7 +256,7 @@ describe("MemoryStorage", () => {
         quantity: 2,
       };
 
-      await createInventoryItem(inventoryItem);
+      await upsertInventoryItem(inventoryItem);
 
       const result = await updateInventoryItem(updatedItem);
 

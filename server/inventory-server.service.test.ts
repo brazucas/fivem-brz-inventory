@@ -12,7 +12,7 @@ import {
 import {
   getItem as getItemStore,
   registerItem as registerItemStore,
-  createInventoryItem as createInventoryItemStore,
+  upsertInventoryItem as upsertInventoryItemStore,
   subtractInventoryItem as subtractInventoryItemStore,
   getInventoryItem as getInventoryItemStore,
   listInventoryItems,
@@ -262,8 +262,8 @@ describe("Server", () => {
     } as InventoryItem;
     describe("successful scenarios", () => {
       afterEach(() => {
-        expect(createInventoryItemStore).toHaveBeenCalledTimes(1);
-        expect(createInventoryItemStore).toHaveBeenCalledWith(inventoryItem);
+        expect(upsertInventoryItemStore).toHaveBeenCalledTimes(1);
+        expect(upsertInventoryItemStore).toHaveBeenCalledWith(inventoryItem);
       });
 
       it("should create inventory item and persist its state when item is valid", async () => {
@@ -291,7 +291,7 @@ describe("Server", () => {
 
     describe("error scenarios", () => {
       afterEach(() => {
-        expect(createInventoryItemStore).not.toHaveBeenCalled();
+        expect(upsertInventoryItemStore).not.toHaveBeenCalled();
       });
 
       it("should throw error when trying to create inventory item when it's not registered", async () => {

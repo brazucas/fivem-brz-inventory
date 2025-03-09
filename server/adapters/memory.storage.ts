@@ -17,7 +17,7 @@ export const registerItem = async (item: Item): Promise<Item> => {
 
 export const getItem = (id: string): Item | null => itemIdIndex[id] || null;
 
-export const createInventoryItem = async (inventoryItem: InventoryItem) => {
+export const upsertInventoryItem = async (inventoryItem: InventoryItem) => {
   if (!inventoryItemsStore[inventoryItem.inventoryId]) {
     inventoryItemsStore[inventoryItem.inventoryId] = {};
   }
