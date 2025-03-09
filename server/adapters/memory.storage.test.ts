@@ -7,7 +7,6 @@ import {
   subtractInventoryItem,
   getInventoryItem,
   inventoryExists,
-  updateInventoryItem,
 } from "./memory.storage";
 import { randomUUID } from "crypto";
 
