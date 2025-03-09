@@ -11,9 +11,10 @@ import {
 } from "./inventory-server.service";
 
 jest.mock("./inventory-server.service", () => ({
-  createInventoryItem: jest.fn(),
+  upsertInventoryItem: jest.fn(),
   getItem: jest.fn(),
   removeInventoryItem: jest.fn(),
+  getPlayerInventoryId: jest.fn().mockReturnValue("player_player-name"),
 }));
 
 jest.mock("@core/helpers/cfx", () => ({
