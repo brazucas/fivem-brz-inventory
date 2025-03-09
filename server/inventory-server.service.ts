@@ -78,7 +78,7 @@ export const upsertInventoryItem = async (
     updatedInventoryItem.quantity = 1;
   }
 
-  await createInventoryItemStore(updatedInventoryItem);
+  await upsertInventoryItemStore(updatedInventoryItem);
   await syncPlayerInventoryState(inventoryItem.inventoryId);
 
   return updatedInventoryItem;

@@ -22,7 +22,7 @@ import { emitNetTyped } from "@core/helpers/cfx";
 jest.mock("./adapters/memory.storage", () => ({
   registerItem: jest.fn(),
   getItem: jest.fn(),
-  createInventoryItem: jest.fn(),
+  upsertInventoryItem: jest.fn(),
   getInventoryItem: jest.fn(),
   subtractInventoryItem: jest.fn(),
   listInventoryItems: jest.fn(),
