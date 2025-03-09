@@ -270,23 +270,6 @@ describe("Server", () => {
         (getItemStore as jest.Mock).mockReturnValueOnce({});
         await upsertInventoryItem(inventoryItem);
       });
-
-      it("should log warn message when trying to create an item with quantity higher than 1 and item is not stackable", async () => {
-        const consoleWarn = jest.spyOn(global.console, "warn");
-
-        (getItemStore as jest.Mock).mockReturnValueOnce({
-          stackable: false,
-        });
-
-        await upsertInventoryItem({
-          ...inventoryItem,
-          quantity: 2,
-        });
-
-        expect(consoleWarn).toHaveBeenCalledWith(
-          "Attempting to give multiple non-stackable items: fake-item-id. Only one will be added."
-        );
-      });
     });
 
     describe("error scenarios", () => {

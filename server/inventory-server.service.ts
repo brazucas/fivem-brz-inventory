@@ -71,13 +71,6 @@ export const upsertInventoryItem = async (
     throw new Error("Durability must be a number between 1 and 100");
   }
 
-  if (inventoryItem.quantity > 1 && !item.stackable) {
-    console.warn(
-      `Attempting to give multiple non-stackable items: ${inventoryItem.itemId}. Only one will be added.`
-    );
-    updatedInventoryItem.quantity = 1;
-  }
-
   await upsertInventoryItemStore(updatedInventoryItem);
   await syncPlayerInventoryState(inventoryItem.inventoryId);
 
