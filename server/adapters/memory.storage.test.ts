@@ -9,6 +9,7 @@ import {
   inventoryExists,
   updateInventoryItem,
 } from "./memory.storage";
+import { randomUUID } from "crypto";
 
 describe("MemoryStorage", () => {
   const props = {
@@ -27,14 +28,6 @@ describe("MemoryStorage", () => {
     initialDurability: 100,
     tradable: false,
   } as Item;
-
-  const inventoryItem = {
-    durability: 100,
-    id: "fake-id",
-    inventoryId: "fake-inventory-id" as InventoryId,
-    itemId: "fake-item-id" as ItemId,
-    quantity: 1,
-  } as InventoryItem;
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -60,14 +53,51 @@ describe("MemoryStorage", () => {
 
   describe("createInventoryItem", () => {
     it("should store inventory item", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
       const storedItem = await createInventoryItem(inventoryItem);
 
       expect(storedItem).toEqual(inventoryItem);
+    });
+
+    it("should increment item quantity when trying to create an existing item", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
+      await createInventoryItem(inventoryItem);
+      await createInventoryItem(inventoryItem);
+
+      const storedItem = await getInventoryItem(
+        inventoryItem.inventoryId,
+        inventoryItem.itemId
+      );
+
+      expect(storedItem).toBeDefined();
+      expect(storedItem?.quantity).toEqual(2);
     });
   });
 
   describe("listInventoryItems", () => {
     it("should return list of inventory items previously registered for inventory id", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
       const item1 = {
         ...inventoryItem,
         itemId: "item-id-1" as ItemId,
@@ -102,6 +132,14 @@ describe("MemoryStorage", () => {
 
   describe("deleteInventoryItem", () => {
     it("should subtract inventory item quantity and return true when item exists and has enough quantity to subtract", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
       const item = {
         ...inventoryItem,
         quantity: 2,
@@ -131,6 +169,14 @@ describe("MemoryStorage", () => {
     });
 
     it("should delete item when quantity is 0", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
       const item = {
         ...inventoryItem,
         quantity: 1,
@@ -148,6 +194,14 @@ describe("MemoryStorage", () => {
 
   describe("getInventoryItem", () => {
     it("should return inventory item when it exists", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
       await createInventoryItem(inventoryItem);
 
       expect(
@@ -167,6 +221,14 @@ describe("MemoryStorage", () => {
 
   describe("inventoryExists", () => {
     it("should return true when inventory exists", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
       await createInventoryItem(inventoryItem);
 
       expect(await inventoryExists(inventoryItem.inventoryId)).toBeTruthy();
@@ -181,6 +243,14 @@ describe("MemoryStorage", () => {
 
   describe("updateInventoryItem", () => {
     it("should update inventory item", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
       const updatedItem = {
         ...inventoryItem,
         quantity: 2,
@@ -199,13 +269,21 @@ describe("MemoryStorage", () => {
     });
 
     it("should throw an error when item doesn't exist", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        inventoryId: randomUUID() as InventoryId,
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
       await expect(
         updateInventoryItem({
           ...inventoryItem,
           itemId: "random-item-id" as ItemId,
         })
       ).rejects.toThrow(
-        `Item random-item-id not found in inventory fake-inventory-id`
+        `Item random-item-id not found in inventory ${inventoryItem.inventoryId}`
       );
     });
   });

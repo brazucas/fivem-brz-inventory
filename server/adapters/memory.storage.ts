@@ -22,6 +22,23 @@ export const createInventoryItem = async (inventoryItem: InventoryItem) => {
     inventoryItemsStore[inventoryItem.inventoryId] = {};
   }
 
+  const existingItem = await getInventoryItem(
+    inventoryItem.inventoryId,
+    inventoryItem.itemId
+  );
+
+  if (existingItem) {
+    const updatedItem: InventoryItem = {
+      ...existingItem,
+      quantity: existingItem.quantity + inventoryItem.quantity,
+    };
+
+    inventoryItemsStore[inventoryItem.inventoryId]![inventoryItem.itemId] =
+      updatedItem;
+
+    return updatedItem;
+  }
+
   inventoryItemsStore[inventoryItem.inventoryId]![inventoryItem.itemId] =
     inventoryItem;
 
