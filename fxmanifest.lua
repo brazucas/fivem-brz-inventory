@@ -6,6 +6,7 @@ game 'gta5'
 
 shared_scripts {
     'settings.js',
+    'items.js',
     '@ox_lib/init.lua',
 }
 
