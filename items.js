@@ -2,7 +2,7 @@ const ITEMS = [
   {
     id: "crowbar",
     name: "Crowbar",
-    type: "other",
+    type: "tool",
     description:
       "A trusty tool for prying things open, or for when you just need to make a point.",
     tier: 1,
