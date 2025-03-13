@@ -197,7 +197,7 @@ const syncPlayerInventoryState = async (playerInventoryIndex: InventoryId) => {
     return;
   }
 
-  const playerInventoryId = getPlayerInventoryId(playerName);
+  const playerInventoryId = getPlayerInventoryId(playerId);
 
   const playerInventoryItems = await listInventoryItems(playerInventoryId);
 
