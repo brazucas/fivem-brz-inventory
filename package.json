@@ -26,7 +26,8 @@
   "jest": {
     "projects": [
       "server/jest.config.js",
-      "client/jest.config.js"
+      "client/jest.config.js",
+      "common/jest.config.js"
     ]
   }
 }
