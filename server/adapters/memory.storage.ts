@@ -1,14 +1,18 @@
 import {
+  Inventory,
   InventoryId,
   InventoryItem,
   InventoryItems,
   Item,
   ItemId,
 } from "@common/types";
+import { randomUUID } from "crypto";
 
 const itemIdIndex: { [id: string]: Item } = {};
 
-const inventoryItemsStore: InventoryItems = {};
+const inventoryStore: {
+  [inventoryId: string]: Inventory;
+} = {};
 
 export const registerItem = async (item: Item): Promise<Item> => {
   itemIdIndex[item.id] = item;
@@ -18,8 +22,15 @@ export const registerItem = async (item: Item): Promise<Item> => {
 export const getItem = (id: string): Item | null => itemIdIndex[id] || null;
 
 export const upsertInventoryItem = async (inventoryItem: InventoryItem) => {
-  if (!inventoryItemsStore[inventoryItem.inventoryId]) {
-    inventoryItemsStore[inventoryItem.inventoryId] = {};
+  if (!inventoryStore[inventoryItem.inventoryId]) {
+    inventoryStore[inventoryItem.inventoryId] = {
+      id: randomUUID(),
+      type: "player",
+      maxWeight: 1000,
+      maxItems: 1000,
+      items: {} as InventoryItems,
+      metadata: {},
+    };
   }
 
   const existingItem = await getInventoryItem(

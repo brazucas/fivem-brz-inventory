@@ -2,7 +2,97 @@ export type Inventory = {
   id: string;
   maxWeight: number;
   maxItems: number;
+  items: InventoryItems;
+  type: keyof typeof InventoryType;
+  metadata: Record<string, any>;
 };
+
+export const PlayerSlots: Slot[] = [
+  {
+    category: "apparel",
+    position: 0,
+    supportedItemConditions: [
+      {
+        type: "category",
+        value: "headwear",
+      },
+    ],
+    placeholderImage: "placeholder_headwear",
+  },
+  {
+    category: "apparel",
+    position: 0,
+    supportedItemConditions: [
+      {
+        type: "category",
+        value: "chestwear",
+      },
+    ],
+    placeholderImage: "placeholder_chestwear",
+  },
+  {
+    category: "apparel",
+    position: 0,
+    supportedItemConditions: [
+      {
+        type: "category",
+        value: "handwear",
+      },
+    ],
+    placeholderImage: "placeholder_handwear",
+  },
+  {
+    category: "apparel",
+    position: 0,
+    supportedItemConditions: [
+      {
+        type: "category",
+        value: "pants",
+      },
+    ],
+    placeholderImage: "placeholder_pants",
+  },
+  {
+    category: "apparel",
+    position: 0,
+    supportedItemConditions: [
+      {
+        type: "category",
+        value: "footwear",
+      },
+    ],
+    placeholderImage: "placeholder_footwear",
+  },
+];
+
+export type Slot = {
+  category: keyof typeof SlotCategory;
+  position: number;
+  defaultHotKey?: string;
+  supportedItemConditions: ItemCondition[];
+  placeholderImage: string;
+};
+
+export type ItemCondition = {
+  type: "item" | "category";
+  value: ItemId | string;
+};
+
+export const SlotCategory = {
+  apparel: "apparel",
+  weapon: "weapon",
+  ammo: "ammo",
+  tool: "tool",
+  consumable: "consumable",
+  buffs: "buffs",
+} as const;
+
+export const InventoryType = {
+  player: "player",
+  object: "object",
+  vehicle: "vehicle",
+  worldPosition: "worldPosition",
+} as const;
 
 export type Item = {
   id: ItemId;
@@ -75,11 +165,7 @@ export type Quantity = number & { __opaque__: "Quantity" };
 export type PositionId = number & { __opaque__: "PositionId" };
 
 export type InventoryItems = {
-  [inventoryId: InventoryId]:
-    | {
-        [itemId: ItemId]: InventoryItem;
-      }
-    | undefined;
+  [itemId: ItemId]: InventoryItem;
 };
 
 export type OrderedInventoryIndex = {
@@ -90,10 +176,6 @@ export type RemoveItemOperationResult = {
   success: boolean;
   removedAll: boolean;
   remainingQuantity: number;
-};
-
-export const InventoryType = {
-  player: "player",
 };
 
 export type InternalClientEvents = {

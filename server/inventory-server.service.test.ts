@@ -260,6 +260,7 @@ describe("Server", () => {
       itemId: "fake-item-id" as ItemId,
       quantity: 1,
     } as InventoryItem;
+
     describe("successful scenarios", () => {
       afterEach(() => {
         expect(upsertInventoryItemStore).toHaveBeenCalledTimes(1);
@@ -323,6 +324,26 @@ describe("Server", () => {
             ).rejects.toThrow("Durability must be a number between 1 and 100");
           }
         );
+      });
+
+      it("it should throw an error if the inventory weight exceeds the limit", async () => {
+        (getItemStore as jest.Mock).mockReturnValueOnce({
+          weight: 10,
+        });
+
+        (listInventoryItems as jest.Mock).mockReturnValueOnce([
+          {
+            ...inventoryItem,
+            quantity: 10,
+          },
+        ]);
+
+        await expect(
+          upsertInventoryItem({
+            ...inventoryItem,
+            quantity: 100,
+          })
+        ).rejects.toThrow("Inventory weight limit exceeded");
       });
     });
   });
