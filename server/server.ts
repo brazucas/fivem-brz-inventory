@@ -1,7 +1,7 @@
 declare const ITEMS: Item[];
 
 import { Item } from "@common/types";
-import { registerItem } from "./inventory-server.service";
+import { registerItem } from "./inventory.service";
 import "./commands";
 
 export const onResourceStart = async (resName: string) => {

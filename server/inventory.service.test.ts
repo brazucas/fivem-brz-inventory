@@ -8,10 +8,10 @@ import {
   getItem,
   upsertInventoryItem,
   removeInventoryItem,
-} from "./inventory-server.service";
+} from "./inventory.service";
 import {
   getItem as getItemStore,
-  registerItem as registerItemStore,
+  createItem as registerItemStore,
   upsertInventoryItem as upsertInventoryItemStore,
   subtractInventoryItem as subtractInventoryItemStore,
   getInventoryItem as getInventoryItemStore,

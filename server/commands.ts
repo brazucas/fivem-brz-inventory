@@ -7,7 +7,7 @@ import {
   getItem,
   getPlayerInventoryId,
   removeInventoryItem,
-} from "./inventory-server.service";
+} from "./inventory.service";
 
 export const givePlayerItemCommand = async (source: number, args: string[]) => {
   const attributes = validateInventoryItemCommand(source, args);

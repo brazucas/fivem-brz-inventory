@@ -8,7 +8,7 @@ import {
   upsertInventoryItem,
   getItem,
   removeInventoryItem,
-} from "./inventory-server.service";
+} from "./inventory.service";
 
 jest.mock("./inventory-server.service", () => ({
   upsertInventoryItem: jest.fn(),

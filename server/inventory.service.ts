@@ -17,7 +17,7 @@ import {
   getItem,
   listInventoryItems,
   listInventoryItems as listInventoryItemsStore,
-  registerItem as persistItem,
+  createItem as persistItem,
   subtractInventoryItem,
 } from "./adapters/memory.storage";
 

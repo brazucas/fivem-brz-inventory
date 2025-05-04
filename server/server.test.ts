@@ -52,7 +52,7 @@ global.GetCurrentResourceName = jest.fn().mockReturnValue("brz-inventory");
 
 import { Item, ItemId } from "@common/types";
 import { onResourceStart } from "./server";
-import { registerItem } from "./inventory-server.service";
+import { registerItem } from "./inventory.service";
 
 jest.mock("./commands", () => ({}));
 
