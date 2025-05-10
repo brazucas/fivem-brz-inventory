@@ -152,6 +152,7 @@ export const ItemDefaults: Partial<Item> = {
   groundObject: "hei_prop_hei_paper_bag",
   tradable: false,
   rarity: "common",
+  ...(ITEM_DEFAULTS || {}),
 };
 
 export type ItemId = string & { __opaque__: "ItemId" };
