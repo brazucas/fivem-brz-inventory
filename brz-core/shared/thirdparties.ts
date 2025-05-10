@@ -9,3 +9,13 @@ export const getAdapter = <K, T>(
 
   return adapters[adapter] as T;
 };
+
+export type QSInventoryItem = {
+  label: string;
+  consume: boolean;
+  stack: boolean;
+  weight: number;
+  client: {
+    image: string;
+  };
+};

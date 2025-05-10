@@ -1,3 +1,4 @@
+import { StoredInventory, StoredItem } from "@/types/storage.types";
 import {
   Inventory,
   InventoryId,
@@ -5,36 +6,63 @@ import {
   InventoryItems,
   Item,
   ItemId,
+  NewInventoryItem,
+  NewItem,
 } from "@common/types";
 import { randomUUID } from "crypto";
 
-const itemIdIndex: { [id: string]: Item } = {};
+const itemsStore: { [id: ItemId]: StoredItem } = {};
 
 const inventoryStore: {
-  [inventoryId: string]: Inventory;
+  [inventoryId: InventoryId]: StoredInventory;
 } = {};
 
-export const registerItem = async (item: Item): Promise<Item> => {
-  itemIdIndex[item.id] = item;
-  return item;
+export const createItem = async (item: NewItem): Promise<Item> => {
+  const id = randomUUID() as ItemId;
+
+  const storedItem: StoredItem = {
+    id,
+    name: item.name,
+    type: item.type,
+    rarity: item.rarity,
+    description: item.description,
+    tier: item.tier,
+    weight: item.weight,
+    stackable: item.stackable,
+    droppable: item.droppable,
+    groundObject: item.groundObject,
+    usable: item.usable,
+    onUseHandler: item.onUseHandler,
+    initialDurability: item.initialDurability,
+    decayable: item.decayable,
+    decayValue: item.decayValue,
+    decayInterval: item.decayInterval,
+    decayChance: item.decayChance,
+    decayThreshold: item.decayThreshold,
+    decayedItem: item.decayedItem,
+    tradable: item.tradable,
+  };
+
+  itemsStore[id] = storedItem;
+
+  return {
+    id,
+    ...item,
+  };
 };
 
-export const getItem = (id: string): Item | null => itemIdIndex[id] || null;
+export const getItem = (id: ItemId): Item | null => itemsStore[id] || null;
 
-export const upsertInventoryItem = async (inventoryItem: InventoryItem) => {
-  if (!inventoryStore[inventoryItem.inventoryId]) {
-    inventoryStore[inventoryItem.inventoryId] = {
-      id: randomUUID(),
-      type: "player",
-      maxWeight: 1000,
-      maxItems: 1000,
-      items: {} as InventoryItems,
-      metadata: {},
-    };
+export const saveInventoryItem = async (
+  inventoryId: InventoryId,
+  inventoryItem: InventoryItem | NewInventoryItem
+) => {
+  if (!inventoryStore[inventoryId]) {
+    throw new Error("Inventory not found");
   }
 
   const existingItem = await getInventoryItem(
-    inventoryItem.inventoryId,
+    inventoryId,
     inventoryItem.itemId
   );
 
@@ -44,14 +72,12 @@ export const upsertInventoryItem = async (inventoryItem: InventoryItem) => {
       quantity: existingItem.quantity + inventoryItem.quantity,
     };
 
-    inventoryItemsStore[inventoryItem.inventoryId]![inventoryItem.itemId] =
-      updatedItem;
+    // inventoryStore[inventoryId].items[inventoryItem.itemId] = updatedItem;
 
     return updatedItem;
   }
 
-  inventoryItemsStore[inventoryItem.inventoryId]![inventoryItem.itemId] =
-    inventoryItem;
+  // inventoryStore[inventoryId].items[inventoryItem.itemId] = inventoryItem;
 
   return inventoryItem;
 };
@@ -59,11 +85,12 @@ export const upsertInventoryItem = async (inventoryItem: InventoryItem) => {
 export const listInventoryItems = async (
   inventoryId: InventoryId
 ): Promise<InventoryItems[]> => {
-  if (!inventoryItemsStore[inventoryId]) {
-    return [];
+  if (!inventoryStore[inventoryId]) {
+    throw new Error("Inventory not found");
   }
 
-  return Object.values(inventoryItemsStore[inventoryId]!);
+  // return Object.values(inventoryStore[inventoryId].items);
+  return [];
 };
 
 export const subtractInventoryItem = async (
@@ -78,20 +105,26 @@ export const subtractInventoryItem = async (
   }
 
   if (storedInventoryItem.quantity - quantity <= 0) {
-    delete inventoryItemsStore[inventoryId]?.[itemId];
+    // delete inventoryStore[inventoryId].items[itemId];
     return true;
   }
 
-  inventoryItemsStore[inventoryId]![itemId].quantity -= quantity;
+  // inventoryStore[inventoryId].items[itemId].quantity -= quantity;
   return true;
 };
 
 export const getInventoryItem = async (
   inventoryId: InventoryId,
   itemId: ItemId
-): Promise<InventoryItem | null> =>
-  inventoryItemsStore[inventoryId]?.[itemId] || null;
+): Promise<InventoryItem | null> => {
+  if (!inventoryStore[inventoryId]) {
+    throw new Error("Inventory not found");
+  }
+
+  // return inventoryStore[inventoryId].items[itemId] || null;
+  return null;
+};
 
 export const inventoryExists = async (
   inventoryId: InventoryId
-): Promise<boolean> => !!inventoryItemsStore[inventoryId];
+): Promise<boolean> => !!inventoryStore[inventoryId];

@@ -1,6 +1,6 @@
 import { InventoryId, InventoryItem, Item, ItemId } from "@common/types";
 import {
-  registerItem,
+  createItem,
   getItem,
   upsertInventoryItem,
   listInventoryItems,
@@ -34,14 +34,14 @@ describe("MemoryStorage", () => {
 
   describe("registerItem", () => {
     it("should store a new item", async () => {
-      const item = await registerItem(props);
+      const item = await createItem(props);
       expect(item).toEqual(props);
     });
   });
 
   describe("getItem", () => {
     it("should retriave a stored item", async () => {
-      const item = await registerItem(props as Item);
+      const item = await createItem(props as Item);
       expect(getItem("test")).toEqual(props);
     });
 
@@ -51,16 +51,31 @@ describe("MemoryStorage", () => {
   });
 
   describe("upsertInventoryItem", () => {
-    it("should store inventory item", async () => {
+    it("should throw error when inventory doesn't exist", async () => {
       const inventoryItem = {
         durability: 100,
         id: randomUUID(),
-        inventoryId: randomUUID() as InventoryId,
         itemId: "fake-item-id" as ItemId,
         quantity: 1,
       } as InventoryItem;
 
-      const storedItem = await upsertInventoryItem(inventoryItem);
+      expect(
+        upsertInventoryItem(randomUUID() as InventoryId, inventoryItem)
+      ).rejects.toThrow(Error("Inventory not found"));
+    });
+
+    it("should store inventory item", async () => {
+      const inventoryItem = {
+        durability: 100,
+        id: randomUUID(),
+        itemId: "fake-item-id" as ItemId,
+        quantity: 1,
+      } as InventoryItem;
+
+      const storedItem = await upsertInventoryItem(
+        randomUUID() as InventoryId,
+        inventoryItem
+      );
 
       expect(storedItem).toEqual(inventoryItem);
     });
@@ -69,16 +84,15 @@ describe("MemoryStorage", () => {
       const inventoryItem = {
         durability: 100,
         id: randomUUID(),
-        inventoryId: randomUUID() as InventoryId,
         itemId: "fake-item-id" as ItemId,
         quantity: 1,
       } as InventoryItem;
 
-      await upsertInventoryItem(inventoryItem);
-      await upsertInventoryItem(inventoryItem);
+      await upsertInventoryItem(randomUUID() as InventoryId, inventoryItem);
+      await upsertInventoryItem(randomUUID() as InventoryId, inventoryItem);
 
       const storedItem = await getInventoryItem(
-        inventoryItem.inventoryId,
+        randomUUID() as InventoryId,
         inventoryItem.itemId
       );
 
@@ -89,10 +103,11 @@ describe("MemoryStorage", () => {
 
   describe("listInventoryItems", () => {
     it("should return list of inventory items previously registered for inventory id", async () => {
+      const inventoryId = randomUUID() as InventoryId;
+
       const inventoryItem = {
         durability: 100,
         id: randomUUID(),
-        inventoryId: randomUUID() as InventoryId,
         itemId: "fake-item-id" as ItemId,
         quantity: 1,
       } as InventoryItem;
@@ -107,10 +122,10 @@ describe("MemoryStorage", () => {
         itemId: "item-id-2" as ItemId,
       };
 
-      await upsertInventoryItem(item1);
-      await upsertInventoryItem(item2);
+      await upsertInventoryItem(inventoryId, item1);
+      await upsertInventoryItem(inventoryId, item2);
 
-      expect(await listInventoryItems(inventoryItem.inventoryId)).toEqual(
+      expect(await listInventoryItems(inventoryId)).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             itemId: "item-id-1",
@@ -131,10 +146,11 @@ describe("MemoryStorage", () => {
 
   describe("deleteInventoryItem", () => {
     it("should subtract inventory item quantity and return true when item exists and has enough quantity to subtract", async () => {
+      const inventoryId = randomUUID() as InventoryId;
+
       const inventoryItem = {
         durability: 100,
         id: randomUUID(),
-        inventoryId: randomUUID() as InventoryId,
         itemId: "fake-item-id" as ItemId,
         quantity: 1,
       } as InventoryItem;
@@ -144,13 +160,13 @@ describe("MemoryStorage", () => {
         quantity: 2,
       };
 
-      await upsertInventoryItem(item);
+      await upsertInventoryItem(inventoryId, item);
 
       expect(
-        await subtractInventoryItem(item.inventoryId, item.itemId, 1)
+        await subtractInventoryItem(inventoryId, item.itemId, 1)
       ).toBeTruthy();
 
-      expect(await getInventoryItem(item.inventoryId, item.itemId)).toEqual(
+      expect(await getInventoryItem(inventoryId, item.itemId)).toEqual(
         expect.objectContaining({
           quantity: 1,
         })
@@ -168,10 +184,11 @@ describe("MemoryStorage", () => {
     });
 
     it("should delete item when quantity is 0", async () => {
+      const inventoryId = randomUUID() as InventoryId;
+
       const inventoryItem = {
         durability: 100,
         id: randomUUID(),
-        inventoryId: randomUUID() as InventoryId,
         itemId: "fake-item-id" as ItemId,
         quantity: 1,
       } as InventoryItem;
@@ -181,31 +198,32 @@ describe("MemoryStorage", () => {
         quantity: 1,
       };
 
-      await upsertInventoryItem(item);
+      await upsertInventoryItem(inventoryId, item);
 
       expect(
-        await subtractInventoryItem(item.inventoryId, item.itemId, 1)
+        await subtractInventoryItem(inventoryId, item.itemId, 1)
       ).toBeTruthy();
 
-      expect(await getInventoryItem(item.inventoryId, item.itemId)).toBeNull();
+      expect(await getInventoryItem(inventoryId, item.itemId)).toBeNull();
     });
   });
 
   describe("getInventoryItem", () => {
     it("should return inventory item when it exists", async () => {
+      const inventoryId = randomUUID() as InventoryId;
+
       const inventoryItem = {
         durability: 100,
         id: randomUUID(),
-        inventoryId: randomUUID() as InventoryId,
         itemId: "fake-item-id" as ItemId,
         quantity: 1,
       } as InventoryItem;
 
-      await upsertInventoryItem(inventoryItem);
+      await upsertInventoryItem(inventoryId, inventoryItem);
 
-      expect(
-        await getInventoryItem(inventoryItem.inventoryId, inventoryItem.itemId)
-      ).toEqual(inventoryItem);
+      expect(await getInventoryItem(inventoryId, inventoryItem.itemId)).toEqual(
+        inventoryItem
+      );
     });
 
     it("should return null when inventory item doesn't exist", async () => {
@@ -220,6 +238,8 @@ describe("MemoryStorage", () => {
 
   describe("inventoryExists", () => {
     it("should return true when inventory exists", async () => {
+      const inventoryId = randomUUID() as InventoryId;
+
       const inventoryItem = {
         durability: 100,
         id: randomUUID(),
@@ -228,9 +248,9 @@ describe("MemoryStorage", () => {
         quantity: 1,
       } as InventoryItem;
 
-      await upsertInventoryItem(inventoryItem);
+      await upsertInventoryItem(inventoryId, inventoryItem);
 
-      expect(await inventoryExists(inventoryItem.inventoryId)).toBeTruthy();
+      expect(await inventoryExists(inventoryId)).toBeTruthy();
     });
 
     it("should return false when inventory doesn't exist", async () => {

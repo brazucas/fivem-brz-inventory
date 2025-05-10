@@ -12,7 +12,7 @@ import {
 } from "@common/types";
 import { emitNetTyped } from "@core/helpers/cfx";
 import {
-  upsertInventoryItem as upsertInventoryItemStore,
+  saveInventoryItem as upsertInventoryItemStore,
   getInventoryItem,
   getItem,
   listInventoryItems,
@@ -71,8 +71,8 @@ export const upsertInventoryItem = async (
     throw new Error("Durability must be a number between 1 and 100");
   }
 
-  await upsertInventoryItemStore(updatedInventoryItem);
-  await syncPlayerInventoryState(inventoryItem.inventoryId);
+  await upsertInventoryItemStore("1" as InventoryId, updatedInventoryItem);
+  await syncPlayerInventoryState("1" as InventoryId);
 
   return updatedInventoryItem;
 };
@@ -147,19 +147,19 @@ const validateUsableItem = (item: Partial<Item>) => {
 
 const validateItemTier = (tier: number) => {
   if (tier < 1 || tier > 5) {
-    throw new Error("Item tier must be between 1 and 5");
+    throw new Error(`Item tier ${tier} must be between 1 and 5`);
   }
 };
 
 const validateItemRarity = (rarity: keyof typeof ItemRarity) => {
   if (Object.values(ItemRarity).indexOf(rarity) === -1) {
-    throw new Error("Invalid item rarity");
+    throw new Error(`Invalid item rarity: ${rarity}`);
   }
 };
 
 const validateItemType = (type: keyof typeof ItemType) => {
   if (Object.values(ItemType).indexOf(type) === -1) {
-    throw new Error("Invalid item type");
+    throw new Error(`Invalid item type: ${type}`);
   }
 };
 

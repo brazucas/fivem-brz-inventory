@@ -1,3 +1,5 @@
+declare const ITEM_DEFAULTS: Partial<Item> | undefined;
+
 export type Inventory = {
   id: string;
   maxWeight: number;
@@ -5,6 +7,24 @@ export type Inventory = {
   items: InventoryItems;
   type: keyof typeof InventoryType;
   metadata: Record<string, any>;
+};
+
+export type QSInventoryItem = {
+  name: string;
+  label: string;
+  weight: number;
+  type: string;
+  image: string;
+  unique: boolean;
+  useable: boolean;
+  shouldClose: boolean;
+  description: string;
+};
+
+export type ThirdPartyInventory = "qs-inventory";
+
+export type Settings = {
+  loadThirdPartyInventory: ThirdPartyInventory | undefined;
 };
 
 export const PlayerSlots: Slot[] = [
@@ -94,8 +114,7 @@ export const InventoryType = {
   worldPosition: "worldPosition",
 } as const;
 
-export type Item = {
-  id: ItemId;
+export type NewItem = {
   name: string;
   type: keyof typeof ItemType;
   rarity: keyof typeof ItemRarity;
@@ -117,12 +136,18 @@ export type Item = {
   tradable: boolean;
 };
 
-export type InventoryItem = {
-  id: string;
-  inventoryId: InventoryId;
+export type Item = NewItem & {
+  id: ItemId;
+};
+
+export type NewInventoryItem = {
   itemId: ItemId;
   quantity: number;
   durability: number;
+};
+
+export type InventoryItem = NewInventoryItem & {
+  id: InventoryItemId;
 };
 
 export const ItemType = {
@@ -130,6 +155,7 @@ export const ItemType = {
   food: "food",
   tool: "tool",
   apparel: "apparel",
+  misc: "misc",
 };
 
 export const ItemRarity = {
@@ -158,6 +184,8 @@ export const ItemDefaults: Partial<Item> = {
 export type ItemId = string & { __opaque__: "ItemId" };
 
 export type InventoryId = string & { __opaque__: "InventoryId" };
+
+export type InventoryItemId = string & { __opaque__: "InventoryItemId" };
 
 export type PlayerId = number & { __opaque__: "PlayerId" };
 
