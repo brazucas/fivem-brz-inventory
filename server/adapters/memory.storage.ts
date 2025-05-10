@@ -1,15 +1,11 @@
 import { StoredInventory, StoredItem } from "@/types/storage.types";
 import {
-  Inventory,
   InventoryId,
   InventoryItem,
   InventoryItems,
   Item,
   ItemId,
-  NewInventoryItem,
-  NewItem,
 } from "@common/types";
-import { randomUUID } from "crypto";
 
 const itemsStore: { [id: ItemId]: StoredItem } = {};
 
@@ -17,8 +13,8 @@ const inventoryStore: {
   [inventoryId: InventoryId]: StoredInventory;
 } = {};
 
-export const createItem = async (item: NewItem): Promise<Item> => {
-  const id = randomUUID() as ItemId;
+export const createItem = async (item: Item): Promise<Item> => {
+  const id = item.id;
 
   const storedItem: StoredItem = {
     id,
@@ -45,17 +41,14 @@ export const createItem = async (item: NewItem): Promise<Item> => {
 
   itemsStore[id] = storedItem;
 
-  return {
-    id,
-    ...item,
-  };
+  return item;
 };
 
 export const getItem = (id: ItemId): Item | null => itemsStore[id] || null;
 
 export const saveInventoryItem = async (
   inventoryId: InventoryId,
-  inventoryItem: InventoryItem | NewInventoryItem
+  inventoryItem: InventoryItem
 ) => {
   if (!inventoryStore[inventoryId]) {
     throw new Error("Inventory not found");
@@ -72,12 +65,18 @@ export const saveInventoryItem = async (
       quantity: existingItem.quantity + inventoryItem.quantity,
     };
 
-    // inventoryStore[inventoryId].items[inventoryItem.itemId] = updatedItem;
+    inventoryStore[inventoryId].items[inventoryItem.itemId] = {
+      ...updatedItem,
+      inventoryId,
+    };
 
     return updatedItem;
   }
 
-  // inventoryStore[inventoryId].items[inventoryItem.itemId] = inventoryItem;
+  inventoryStore[inventoryId].items[inventoryItem.itemId] = {
+    ...inventoryItem,
+    inventoryId,
+  };
 
   return inventoryItem;
 };
@@ -89,8 +88,7 @@ export const listInventoryItems = async (
     throw new Error("Inventory not found");
   }
 
-  // return Object.values(inventoryStore[inventoryId].items);
-  return [];
+  return Object.values(inventoryStore[inventoryId].items);
 };
 
 export const subtractInventoryItem = async (
@@ -105,11 +103,11 @@ export const subtractInventoryItem = async (
   }
 
   if (storedInventoryItem.quantity - quantity <= 0) {
-    // delete inventoryStore[inventoryId].items[itemId];
+    delete inventoryStore[inventoryId].items[itemId];
     return true;
   }
 
-  // inventoryStore[inventoryId].items[itemId].quantity -= quantity;
+  inventoryStore[inventoryId].items[itemId].quantity -= quantity;
   return true;
 };
 
@@ -121,10 +119,12 @@ export const getInventoryItem = async (
     throw new Error("Inventory not found");
   }
 
-  // return inventoryStore[inventoryId].items[itemId] || null;
-  return null;
+  return inventoryStore[inventoryId].items[itemId] || null;
 };
 
 export const inventoryExists = async (
   inventoryId: InventoryId
 ): Promise<boolean> => !!inventoryStore[inventoryId];
+
+export const listItems = async (): Promise<StoredItem[]> =>
+  Object.values(itemsStore);

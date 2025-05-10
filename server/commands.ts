@@ -1,4 +1,9 @@
-import { InternalClientEvents, ItemId, Quantity } from "@common/types";
+import {
+  InternalClientEvents,
+  InventoryItemId,
+  ItemId,
+  Quantity,
+} from "@common/types";
 import { emitNetTyped, isPlayerConnected } from "@core/helpers/cfx";
 import { notify } from "@core/notification";
 import { randomUUID } from "crypto";
@@ -7,6 +12,7 @@ import {
   getItem,
   getPlayerInventoryId,
   removeInventoryItem,
+  listItems,
 } from "./inventory.service";
 
 export const givePlayerItemCommand = async (source: number, args: string[]) => {
@@ -19,10 +25,9 @@ export const givePlayerItemCommand = async (source: number, args: string[]) => {
   const { playerId, itemId, quantity, playerName } = attributes;
 
   try {
-    await upsertInventoryItem({
-      id: randomUUID(),
+    await upsertInventoryItem(getPlayerInventoryId(playerId), {
+      id: randomUUID() as InventoryItemId,
       durability: 100,
-      inventoryId: getPlayerInventoryId(playerId),
       itemId,
       quantity,
     });
@@ -113,5 +118,18 @@ const validateInventoryItemCommand = (source: number, args: string[]) => {
   return { playerId, itemId, quantity, playerName };
 };
 
+const listConsoleAllItems = async (source: number) => {
+  if (source !== 0) {
+    notify(source, "This command is not available", "error");
+    return;
+  }
+
+  const items = await listItems();
+  const itemIds = items.map((item) => item.id).join(", ");
+
+  notify(source, `Items: ${itemIds}`, "success");
+};
+
 RegisterCommand("givePlayerItem", givePlayerItemCommand, false);
 RegisterCommand("removePlayerItem", removePlayerItemCommand, false);
+RegisterCommand("listConsoleAllItems", listConsoleAllItems, false);

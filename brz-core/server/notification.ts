@@ -28,4 +28,7 @@ export const notify = (
   source: number,
   message: string,
   type: "success" | "error"
-) => getServerAdapter().notify(source, message, type);
+) => {
+  console.log(`Notification: ${message} | Type: ${type} | Source: ${source}`);
+  return getServerAdapter().notify(source, message, type);
+};

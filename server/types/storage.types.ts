@@ -13,6 +13,9 @@ export type StoredInventory = {
   maxWeight: number;
   maxItems: number;
   type: keyof typeof InventoryType;
+  items: {
+    [itemId: ItemId]: StoredInventoryItem;
+  };
 };
 
 export type StoredInventoryItem = {

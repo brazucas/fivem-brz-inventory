@@ -19,6 +19,7 @@ import {
   listInventoryItems as listInventoryItemsStore,
   createItem as persistItem,
   subtractInventoryItem,
+  listItems,
 } from "./adapters/memory.storage";
 
 export const getPlayerInventoryId = (playerId: string): InventoryId => {
@@ -47,6 +48,7 @@ export const registerItem = async (item: Partial<Item>): Promise<Item> => {
 };
 
 export const upsertInventoryItem = async (
+  inventoryId: InventoryId,
   inventoryItem: InventoryItem
 ): Promise<InventoryItem> => {
   const item = getItem(inventoryItem.itemId);
@@ -71,8 +73,8 @@ export const upsertInventoryItem = async (
     throw new Error("Durability must be a number between 1 and 100");
   }
 
-  await upsertInventoryItemStore("1" as InventoryId, updatedInventoryItem);
-  await syncPlayerInventoryState("1" as InventoryId);
+  await upsertInventoryItemStore(inventoryId, updatedInventoryItem);
+  await syncPlayerInventoryState(inventoryId);
 
   return updatedInventoryItem;
 };
@@ -216,4 +218,4 @@ const syncPlayerInventoryState = async (playerInventoryIndex: InventoryId) => {
   );
 };
 
-export { getItem, listInventoryItemsStore as listInventoryItems };
+export { getItem, listInventoryItemsStore as listInventoryItems, listItems };

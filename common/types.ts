@@ -114,7 +114,8 @@ export const InventoryType = {
   worldPosition: "worldPosition",
 } as const;
 
-export type NewItem = {
+export type Item = {
+  id: ItemId;
   name: string;
   type: keyof typeof ItemType;
   rarity: keyof typeof ItemRarity;
@@ -134,10 +135,6 @@ export type NewItem = {
   decayThreshold?: number;
   decayedItem?: ItemId;
   tradable: boolean;
-};
-
-export type Item = NewItem & {
-  id: ItemId;
 };
 
 export type NewInventoryItem = {
