@@ -11,11 +11,11 @@
   },
   "devDependencies": {
     "@brz-fivem-sdk/client": "^0.1.0",
-    "@brz-fivem-sdk/server": "^0.1.1",
+    "@brz-fivem-sdk/server": "^0.1.4",
     "@citizenfx/client": "^2.0.13045-1",
     "@citizenfx/server": "^2.0.13045-1",
     "@types/jest": "27",
-    "esbuild": "^0.25.5",
+    "esbuild": "^0.20.2",
     "git-cliff": "1",
     "husky": "8",
     "jest": "27",

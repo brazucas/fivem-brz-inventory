@@ -13,5 +13,5 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["./**/*", "../brz-core/server", "../common/**/*"]
+  "include": ["./**/*", "../common/**/*"]
 }
