@@ -10,7 +10,7 @@ import {
   ItemType,
   RemoveItemOperationResult,
 } from "@common/types";
-import { emitNetTyped } from "@core/helpers/cfx";
+import { emitNetTyped } from "@brz-fivem-sdk/server/helpers/cfx";
 import {
   saveInventoryItem as upsertInventoryItemStore,
   getInventoryItem,

@@ -4,8 +4,11 @@ import {
   ItemId,
   Quantity,
 } from "@common/types";
-import { emitNetTyped, isPlayerConnected } from "@core/helpers/cfx";
-import { notify } from "@core/notification";
+import {
+  emitNetTyped,
+  isPlayerConnected,
+} from "@brz-fivem-sdk/server/helpers/cfx";
+import { notify } from "@brz-fivem-sdk/server/notification";
 import { randomUUID } from "crypto";
 import {
   upsertInventoryItem,

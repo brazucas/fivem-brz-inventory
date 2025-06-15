@@ -6,6 +6,7 @@ const TARGET_ENTRIES = [
     entryPoints: ["server/server.ts"],
     platform: "node",
     outfile: "./dist/server/server.js",
+    external: ["@brz-fivem-sdk/server", "@brz-fivem-sdk/client"],
   },
   {
     target: "es2020",
